@@ -2,6 +2,7 @@ package dev.qynl.backrooms.horror;
 
 import dev.qynl.backrooms.BackroomsMod;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -40,10 +41,10 @@ public class ListenerRenderer extends EntityRenderer<ListenerEntity> {
         float w = 0.5f + sway;
         float h = 2.6f;
         int a = 215;
-        vc.vertex(m, -w, 0, 0).color(6, 6, 8, a).texture(0, 1).light(15728640).normal(0.0f, 0.0f, 1.0f);
-        vc.vertex(m, -w, h, 0).color(6, 6, 8, a).texture(0, 0).light(15728640).normal(0.0f, 0.0f, 1.0f);
-        vc.vertex(m, w, h, 0).color(6, 6, 8, a).texture(1, 0).light(15728640).normal(0.0f, 0.0f, 1.0f);
-        vc.vertex(m, w, 0, 0).color(6, 6, 8, a).texture(1, 1).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -w, 0, 0).color(6, 6, 8, a).texture(0, 1).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -w, h, 0).color(6, 6, 8, a).texture(0, 0).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, h, 0).color(6, 6, 8, a).texture(1, 0).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, 0, 0).color(6, 6, 8, a).texture(1, 1).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
 
         matrices.pop();
         super.render(entity, yaw, tickDelta, matrices, vcp, light);
