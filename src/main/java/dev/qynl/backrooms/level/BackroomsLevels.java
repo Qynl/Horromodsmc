@@ -38,6 +38,10 @@ public final class BackroomsLevels {
     /** Level 6 - "Lights Out": pitch-black metal corridors. */
     public static final LevelTheme LEVEL_6 = new LevelTheme(6, "Level 6", "level6", "level6", 328965, 131330);
 
+    public static final LevelTheme LEVEL_7 = new LevelTheme(7, "Level 7", "level7", "level7", 665162, 398376);
+
+    public static final LevelTheme LEVEL_8 = new LevelTheme(8, "Level 8", "level8", "level8", 131586, 65793);
+
     private static final Map<Integer, LevelTheme> LEVELS = new HashMap<>();
 
     static {
@@ -48,6 +52,8 @@ public final class BackroomsLevels {
         register(LEVEL_4);
         register(LEVEL_5);
         register(LEVEL_6);
+        register(LEVEL_7);
+        register(LEVEL_8);
     }
 
     public static void register(LevelTheme theme) {

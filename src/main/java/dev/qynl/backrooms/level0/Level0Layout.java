@@ -273,7 +273,7 @@ public final class Level0Layout {
         long h = mix(seed, drift ^ PROP_SALT, x, z);
         int roll = (int) Math.floorMod(h >>> 17, 1000);
         // Crates and drums are the "resources" of the deeper levels, so clutter is denser there.
-        int base = level == 1 ? 42 : level == 2 ? 34 : level == 3 ? 30 : level == 4 ? 20 : level == 5 ? 26 : level == 6 ? 12 : 26;
+        int base = level == 1 ? 42 : level == 2 ? 34 : level == 3 ? 30 : level == 4 ? 20 : level == 5 ? 26 : level == 6 ? 12 : level == 7 ? 12 : level == 8 ? 22 : 26;
         int density = style(x, z) == Style.DARK ? base / 2 : base;
         if (roll >= density) return PROP_NONE;
         return 1 + (int) Math.floorMod(h >>> 29, PROP_COUNT);
@@ -283,7 +283,7 @@ public final class Level0Layout {
 
     /** Level 1 only: a shallow puddle of stagnant liquid on open floor. Sparse and deniable. */
     public boolean puddleAt(int x, int z) {
-        if (level != 1 && level != 3) return false;
+        if (level != 1 && level != 3 && level != 8) return false;
         int bits = tileBits(x, z);
         if ((bits & BIT_SOLID) != 0 || (bits & BIT_PILLAR) != 0) return false;
         long h = mix(seed, drift ^ PUDDLE_SALT, x, z);
@@ -379,6 +379,17 @@ public final class Level0Layout {
                 case HALL, HUB -> 2 + 2;                     // 4
                 default -> 3;
             };
+        } else if (level == 7) {
+            ceilingY = switch (style) {
+                case HALL, HUB, POOLROOM -> 2 + 5;           // 7: deep water under a lid
+                default -> 2 + 4;                            // 6
+            };
+        } else if (level == 8) {
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 4 + rng.nextInt(2);    // 6-7: cavernous
+                case LONG -> 3;                              // tight crawl tunnels
+                default -> 2 + 2 + rng.nextInt(2);           // 4-5
+            };
         } else {
             ceilingY = switch (style) {
                 case HALL, HUB -> 2 + 4 + rng.nextInt(2);   // 6-7: high, echoing
@@ -447,6 +458,17 @@ public final class Level0Layout {
                 case HALL, HUB -> 10;
                 case LONG -> 9;
                 default -> 11 + rng.nextInt(3);  // almost never a working light
+            };
+        } else if (level == 7) {
+            spacing = switch (style) {
+                case HALL, HUB, POOLROOM -> 14;  // dim natural light over open water
+                default -> 12 + rng.nextInt(3);
+            };
+        } else if (level == 8) {
+            spacing = switch (style) {
+                case HALL, HUB -> 8;
+                case LONG -> 7;
+                default -> 9 + rng.nextInt(3);   // dark caves, rare light
             };
         } else {
             spacing = switch (style) {
@@ -526,6 +548,26 @@ public final class Level0Layout {
             wDark = 0.34 + 0.20 * deep;
             wLong = 0.28 + 0.06 * deep;
             wHub = 0.02;
+            wImpossible = 0.06 + 0.06 * deep;
+            wPoolroom = 0.0;
+        } else if (level == 7) {
+            // Thalassophobia: open dark water broken by rock islands.
+            wGrid = 0.10;
+            wOrganic = 0.16;
+            wHall = 0.24;
+            wDark = 0.10;
+            wLong = 0.14;
+            wHub = 0.04;
+            wImpossible = 0.04;
+            wPoolroom = 0.18;
+        } else if (level == 8) {
+            // Cave System: twisting rocky tunnels and chambers, dark.
+            wGrid = 0.16;
+            wOrganic = 0.24;
+            wHall = 0.14;
+            wDark = 0.20 + 0.16 * deep;
+            wLong = 0.16;
+            wHub = 0.04;
             wImpossible = 0.06 + 0.06 * deep;
             wPoolroom = 0.0;
         } else {

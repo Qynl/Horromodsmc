@@ -1,4 +1,4 @@
-# The Backrooms — Levels 0-6
+# The Backrooms — Levels 0-8
 
 A Fabric mod for **Minecraft 1.21.1** that adds a rare tear in the Overworld leading into an
 effectively endless, buzzing, yellow **Level 0** — and, deeper still, the damp concrete warehouse
@@ -77,7 +77,20 @@ labyrinth. Home to Hounds, Smilers and **Skin-Stealers**. Source: backrooms-wiki
 oppressive silence. You feel your way through; something in the dark feels its way toward you.
 Source: backrooms-wiki.wikidot.com/level-6.
 
-### Getting deeper (the wiki's way in)
+### Level 7 — "Thalassophobia"
+
+The wiki's **ocean**. A staircase down from Level 6 opens onto an endless, freezing sea under a high
+concrete lid, with a little air to surface into; the seafloor is carpeted and broken by rock islands
+and drifting wreckage. It is dim, vast, and you swim. The wiki's predators — the Thing on Level 7 and
+Tiny — are represented by the hunters that patrol the water.
+
+## Level 8 — "Cave System"
+
+The wiki's **caves**: dark, damp, twisting rocky tunnels and chambers, with rubble, stalagmites, and
+cold pools. Smilers and Skin-Stealers wait in the dark. Per the wiki, it is reached through the
+underwater cave off Level 7.
+
+## Getting deeper (the wiki's way in)
 - **Overworld → Level 0**: the rare **tear** in normal terrain — walk in.
 - **Level 0 → Level 1**: per the wiki, *"survive long enough to find a **flickering wall** to throw
   yourself through."* Rare sections of wall stutter and are not quite solid; step into one.
@@ -90,6 +103,8 @@ Source: backrooms-wiki.wikidot.com/level-6.
   door down into the hotel.
 - **Level 5 → Level 6**: per the wiki, Level 6 is reached *"through the Boiler Room"* — the deeper,
   darker you go, the more the hotel gives way to the dark. Find the boiler-room door.
+- **Level 6 → Level 7**: per the wiki, a **staircase down** from Level 6 opens onto the ocean.
+- **Level 7 → Level 8**: per the wiki, an **underwater cave** in the depths leads to the caves.
 
 > **You cannot dig out.** Blocks cannot be broken anywhere inside the Backrooms — the only way down
 > is the way the level gives you.

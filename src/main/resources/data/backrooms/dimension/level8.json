@@ -1,0 +1,18 @@
+{
+  "type": "backrooms:level8",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "backrooms:level8",
+      "features": true,
+      "lakes": false,
+      "layers": [
+        {
+          "block": "minecraft:bedrock",
+          "height": 16
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

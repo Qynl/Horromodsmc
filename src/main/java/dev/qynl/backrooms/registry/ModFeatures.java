@@ -32,6 +32,12 @@ public final class ModFeatures {
     public static final Feature<DefaultFeatureConfig> LEVEL6_BUILD =
             register("level6_build", new BackroomsBuildFeature(6));
 
+    public static final Feature<DefaultFeatureConfig> LEVEL7_BUILD =
+            register("level7_build", new BackroomsBuildFeature(7));
+
+    public static final Feature<DefaultFeatureConfig> LEVEL8_BUILD =
+            register("level8_build", new BackroomsBuildFeature(8));
+
     public static final Feature<DefaultFeatureConfig> REALITY_HOLE =
             register("reality_hole", new RealityHoleFeature());
 

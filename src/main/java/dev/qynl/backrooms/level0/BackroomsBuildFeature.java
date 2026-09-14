@@ -94,10 +94,15 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             return;
         }
 
-        // Open space: air inside, ceiling on top.
+        // Open space: air inside (flooded on Level 7), ceiling on top.
         for (int y = Level0Layout.WALL_MIN_Y; y < ceilingY; y++) {
             mutable.set(x, y, z);
-            world.setBlockState(mutable, Blocks.AIR.getDefaultState(), 3);
+            if (levelId == 7 && y < ceilingY - 1) {
+                // Thalassophobia: the corridor is ocean; leave an air gap to surface into.
+                world.setBlockState(mutable, Blocks.WATER.getDefaultState(), 3);
+            } else {
+                world.setBlockState(mutable, Blocks.AIR.getDefaultState(), 3);
+            }
         }
         mutable.set(x, ceilingY, z);
         if (lightState != Level0Layout.LIGHT_NONE) {
@@ -156,6 +161,9 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             // Lights Out: cold metal, here and there wrapped in piping.
             return (!pillar && wallPipeRoll(x, z) ? ModBlocks.PIPE_WALL : ModBlocks.METAL).getDefaultState();
         }
+        if (levelId == 7 || levelId == 8) {
+            return ModBlocks.CONCRETE.getDefaultState();  // rock: ocean islands / cave walls
+        }
         if (!level0) {
             // Levels 2 and 3 carry heavy piping and wiring along their brick walls.
             if ((levelId == 2 || levelId == 3) && !pillar && wallPipeRoll(x, z)) {
@@ -170,7 +178,8 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         if (levelId == 4) {
             return ModBlocks.OFFICE_CARPET.getDefaultState();
         }
-        if (levelId == 5) {
+        if (levelId == 5 || levelId == 7) {
+            // Terror Hotel floor; the carpeted ocean floor of Level 7.
             return ModBlocks.HOTEL_CARPET.getDefaultState();
         }
         return level0 ? withVariant(ModBlocks.CARPET.getDefaultState(), surface)
@@ -248,6 +257,14 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
                 default -> ModBlocks.DEBRIS_PILE;
             };
         }
+        if (levelId == 7) {
+            // Drifting wreckage on the sea floor.
+            return prop == Level0Layout.PROP_BARREL ? ModBlocks.METAL_BARREL : ModBlocks.WOOD_CRATE;
+        }
+        if (levelId == 8) {
+            // Cave rubble and stalagmites.
+            return ModBlocks.DEBRIS_PILE;
+        }
         return switch (prop) {
             case Level0Layout.PROP_CHAIR -> ModBlocks.OFFICE_CHAIR;
             case Level0Layout.PROP_DESK -> ModBlocks.DESK;
@@ -264,7 +281,21 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         if (levelId == 3 && elevatorRoll(x, z)) return ModBlocks.ELEVATOR;
         if (levelId == 4 && stairDoorRoll(x, z)) return ModBlocks.STAIR_DOOR;
         if (levelId == 5 && boilerDoorRoll(x, z)) return ModBlocks.BOILER_DOOR;
+        if (levelId == 6 && stairDownRoll(x, z)) return ModBlocks.STAIR_DOWN;
+        if (levelId == 7 && caveMouthRoll(x, z)) return ModBlocks.CAVE_MOUTH;
         return null;
+    }
+
+    /** Level 6 -> 7: the staircase down to the ocean (wiki: stairs from Level 6). */
+    private static boolean stairDownRoll(int x, int z) {
+        long h = ((long) x * 0x9E3779B97F4A7C15L) ^ ((long) z * 0x7EA5E7L);
+        return Math.floorMod(h >>> 21, 1000) < 4;
+    }
+
+    /** Level 7 -> 8: the underwater cave mouth (wiki: cave in an underwater mountain). */
+    private static boolean caveMouthRoll(int x, int z) {
+        long h = ((long) x * 0xCA4E17L) ^ ((long) z * 0xC6BC279692B5C323L);
+        return Math.floorMod(h >>> 23, 1000) < 3;
     }
 
     private static boolean stairDoorRoll(int x, int z) {

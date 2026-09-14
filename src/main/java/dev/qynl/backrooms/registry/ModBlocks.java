@@ -144,6 +144,16 @@ public final class ModBlocks {
                     .mapColor(MapColor.BLACK).noCollision()
                     .strength(-1.0f, 3600000.0f).sounds(SoundGroup.METAL), 6));
 
+    // Ways down: the staircase to the ocean (Level 6 -> 7) and the underwater cave (Level 7 -> 8).
+    public static final Block STAIR_DOWN = register("stair_down", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.BLUE).noCollision()
+                    .strength(-1.0f, 3600000.0f).sounds(SoundGroup.METAL), 7));
+    public static final Block CAVE_MOUTH = register("cave_mouth", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.STONE_GRAY).noCollision()
+                    .strength(-1.0f, 3600000.0f).sounds(SoundGroup.STONE), 8));
+
     private static Block prop(float strength) {
         return new Block(AbstractBlock.Settings.create()
                 .mapColor(MapColor.GRAY)

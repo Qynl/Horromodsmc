@@ -58,5 +58,9 @@
   "block.backrooms.stair_door": "Office Stairway",
   "block.backrooms.boiler_door": "Boiler Room Door",
   "backrooms.level5": "Level 5 - Terror Hotel",
-  "backrooms.level6": "Level 6 - Lights Out"
+  "backrooms.level6": "Level 6 - Lights Out",
+  "block.backrooms.stair_down": "Staircase Down",
+  "block.backrooms.cave_mouth": "Cave Mouth",
+  "backrooms.level7": "Level 7 - Lights Out",
+  "backrooms.level8": "Level 8 - Lights Out"
 }
