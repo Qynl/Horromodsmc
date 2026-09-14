@@ -261,7 +261,11 @@ class Level0Layout:
         bits = bytearray([BIT_SOLID] * (N * N))
         room = [False] * (N * N)
 
-        if style == 4:
+        if self.level == 7:
+            self._build_ocean(bits, rng)
+        elif self.level == 8:
+            self._build_caves(bits, rng)
+        elif style == 4:
             self._build_long(bits, rng)
         elif style == 2:
             self._build_hall(bits, room, rng)
@@ -273,11 +277,12 @@ class Level0Layout:
             self._build_standard(bits, room, rng, style)
 
         self._carve_border_gateways(bits, dx, dz)
-        _add_alcoves(bits, rng)
-        _add_dead_ends(bits, rng)
-        _add_pillars(bits, room, rng, style)
-        if style == 6:
-            _add_impossible_geometry(bits, rng)
+        if self.level != 7 and self.level != 8:
+            _add_alcoves(bits, rng)
+            _add_dead_ends(bits, rng)
+            _add_pillars(bits, room, rng, style)
+            if style == 6:
+                _add_impossible_geometry(bits, rng)
 
         if self.level == 1:
             spacing = 7 if style in (2, 5) else (5 if style == 4 else 6 + rng.next_int(3))
@@ -307,6 +312,50 @@ class Level0Layout:
         self._apply_lighting_and_surfaces(bits, dx, dz, spacing, off_x, off_z, style)
 
         return DistrictPlan(dx, dz, style, ceiling_y, spacing, off_x, off_z, bytes(bits))
+
+    def _build_ocean(self, bits, rng):
+        for i in range(N * N):
+            bits[i] = 0
+        islands = 3 + rng.next_int(4)
+        for _ in range(islands):
+            cx = 2 + rng.next_int(N - 4)
+            cz = 2 + rng.next_int(N - 4)
+            r = 1 + rng.next_int(3)
+            self._stamp_disc(bits, cx, cz, r, True)
+
+    def _build_caves(self, bits, rng):
+        cx = N // 2
+        cz = N // 2
+        self._stamp_disc(bits, cx, cz, 2, False)
+        worms = 5 + rng.next_int(3)
+        for _ in range(worms):
+            ang = rng.next_double() * math.pi * 2
+            x, z = cx, cz
+            steps = N + rng.next_int(N)
+            for _s in range(steps):
+                ang += (rng.next_double() - 0.5) * 1.1
+                sx = int(math.floor(math.cos(ang) + 0.5))
+                sz = int(math.floor(math.sin(ang) + 0.5))
+                if sx == 0 and sz == 0:
+                    sx = 1
+                x = max(1, min(N - 2, x + sx))
+                z = max(1, min(N - 2, z + sz))
+                bits[x * N + z] &= 0xFE
+                if x + 1 <= N - 2:
+                    bits[(x + 1) * N + z] &= 0xFE
+                if rng.next_int(14) == 0:
+                    self._stamp_disc(bits, x, z, 1 + rng.next_int(2), False)
+
+    @staticmethod
+    def _stamp_disc(bits, cx, cz, r, solid):
+        for x in range(max(0, cx - r), min(N - 1, cx + r) + 1):
+            for z in range(max(0, cz - r), min(N - 1, cz + r) + 1):
+                dx, dz = x - cx, z - cz
+                if dx * dx + dz * dz <= r * r:
+                    if solid:
+                        bits[x * N + z] |= BIT_SOLID
+                    else:
+                        bits[x * N + z] &= 0xFE
 
     def _choose_style(self, rng: JavaRandom, dx: int, dz: int) -> int:
         dist = math.sqrt((dx * N) ** 2 + (dz * N) ** 2)

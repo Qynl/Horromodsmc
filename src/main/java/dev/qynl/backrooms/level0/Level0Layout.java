@@ -402,23 +402,33 @@ public final class Level0Layout {
         Arrays.fill(bits, (byte) BIT_SOLID);
         boolean[] room = new boolean[N * N];
 
-        switch (style) {
-            case LONG -> buildLong(bits, rng);
-            case HALL -> buildHall(bits, room, rng);
-            case HUB -> buildHub(bits, room, rng);
-            case POOLROOM -> buildPoolroom(bits, room, rng);
-            default -> buildStandard(bits, room, rng, style);
+        if (level == 7) {
+            // Thalassophobia: not a maze at all - an open ocean dotted with rock islands.
+            buildOcean(bits, rng);
+        } else if (level == 8) {
+            // Cave System: organic caverns and meandering tunnels bored through solid rock.
+            buildCaves(bits, rng);
+        } else {
+            switch (style) {
+                case LONG -> buildLong(bits, rng);
+                case HALL -> buildHall(bits, room, rng);
+                case HUB -> buildHub(bits, room, rng);
+                case POOLROOM -> buildPoolroom(bits, room, rng);
+                default -> buildStandard(bits, room, rng, style);
+            }
         }
 
         // Every district connects to all four neighbours, always. Done after the interior so the
         // tunnels punch through whatever the style left in the way.
         carveBorderGateways(bits, dx, dz);
 
-        // Architectural imperfections. These run last so they can chew on the finished plan.
-        addAlcoves(bits, rng);
-        addDeadEnds(bits, rng);
-        addPillars(bits, room, rng, style);
-        if (style == Style.IMPOSSIBLE) addImpossibleGeometry(bits, rng);
+        // Architectural imperfections. Maze levels only - the ocean and caves shape themselves.
+        if (level != 7 && level != 8) {
+            addAlcoves(bits, rng);
+            addDeadEnds(bits, rng);
+            addPillars(bits, room, rng, style);
+            if (style == Style.IMPOSSIBLE) addImpossibleGeometry(bits, rng);
+        }
 
         // Lighting. Depends on nothing but position + reliability, so it can be queried per block
         // without a second pass.
@@ -862,6 +872,61 @@ public final class Level0Layout {
     }
 
     // ---- carving helpers -------------------------------------------------
+
+    /**
+     * Level 7 - Thalassophobia. The wiki's ocean: an open body of water (every tile open) broken only
+     * by a scatter of rock islands. Nothing like the room-grid of the other levels - you swim.
+     */
+    private void buildOcean(byte[] bits, Random rng) {
+        Arrays.fill(bits, (byte) 0);                       // all open water
+        int islands = 3 + rng.nextInt(4);                  // 3-6 islands per district
+        for (int i = 0; i < islands; i++) {
+            int cx = 2 + rng.nextInt(N - 4);
+            int cz = 2 + rng.nextInt(N - 4);
+            int r = 1 + rng.nextInt(3);                    // radius 1-3
+            stampDisc(bits, cx, cz, r, true);
+        }
+    }
+
+    /**
+     * Level 8 - Cave System. The wiki's caves: start as solid rock and bore a connected network of
+     * meandering worm tunnels out from a central cavern, widening here and there into chambers.
+     * Every tunnel emanates from the centre, so the whole system is one connected space.
+     */
+    private void buildCaves(byte[] bits, Random rng) {
+        int cx = N / 2, cz = N / 2;
+        stampDisc(bits, cx, cz, 2, false);                 // central cavern
+        int worms = 5 + rng.nextInt(3);                    // 5-7 tunnels
+        for (int w = 0; w < worms; w++) {
+            double ang = rng.nextDouble() * Math.PI * 2;
+            int x = cx, z = cz;
+            int steps = N + rng.nextInt(N);
+            for (int s = 0; s < steps; s++) {
+                ang += (rng.nextDouble() - 0.5) * 1.1;     // meander
+                int sx = (int) Math.round(Math.cos(ang));
+                int sz = (int) Math.round(Math.sin(ang));
+                if (sx == 0 && sz == 0) sx = 1;
+                x = Math.max(1, Math.min(N - 2, x + sx));
+                z = Math.max(1, Math.min(N - 2, z + sz));
+                bits[x * N + z] &= (byte) ~BIT_SOLID;
+                if (x + 1 <= N - 2) bits[(x + 1) * N + z] &= (byte) ~BIT_SOLID;  // 2-wide tunnel
+                if (rng.nextInt(14) == 0) stampDisc(bits, x, z, 1 + rng.nextInt(2), false);
+            }
+        }
+    }
+
+    /** Fills (solid=true) or clears (solid=false) a rough disc of radius r at (cx,cz). */
+    private static void stampDisc(byte[] bits, int cx, int cz, int r, boolean solid) {
+        for (int x = Math.max(0, cx - r); x <= Math.min(N - 1, cx + r); x++) {
+            for (int z = Math.max(0, cz - r); z <= Math.min(N - 1, cz + r); z++) {
+                int dx = x - cx, dz = z - cz;
+                if (dx * dx + dz * dz <= r * r) {
+                    if (solid) bits[x * N + z] |= (byte) BIT_SOLID;
+                    else bits[x * N + z] &= (byte) ~BIT_SOLID;
+                }
+            }
+        }
+    }
 
     private static void carveH(byte[] bits, int row, int width) {
         for (int x = 0; x < N; x++) {
