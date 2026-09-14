@@ -261,7 +261,19 @@ class Level0Layout:
         bits = bytearray([BIT_SOLID] * (N * N))
         room = [False] * (N * N)
 
-        if self.level == 7:
+        if self.level == 1:
+            self._build_warehouse(bits, rng)
+        elif self.level == 2:
+            self._build_tunnels(bits, rng, 8, 1)
+        elif self.level == 3:
+            self._build_room_grid(bits, rng, 7)
+        elif self.level == 4:
+            self._build_room_grid(bits, rng, 5)
+        elif self.level == 5:
+            self._build_hotel(bits, rng)
+        elif self.level == 6:
+            self._build_tunnels(bits, rng, 6, 1)
+        elif self.level == 7:
             self._build_ocean(bits, rng)
         elif self.level == 8:
             self._build_caves(bits, rng)
@@ -312,6 +324,70 @@ class Level0Layout:
         self._apply_lighting_and_surfaces(bits, dx, dz, spacing, off_x, off_z, style)
 
         return DistrictPlan(dx, dz, style, ceiling_y, spacing, off_x, off_z, bytes(bits))
+
+    def _build_warehouse(self, bits, rng):
+        for i in range(N * N):
+            bits[i] = 0
+        for x in range(2, N - 1, 4):
+            for z in range(2, N - 1, 4):
+                bits[x * N + z] |= BIT_PILLAR
+        blocks = 2 + rng.next_int(3)
+        for _ in range(blocks):
+            cx = 2 + rng.next_int(N - 5)
+            cz = 2 + rng.next_int(N - 5)
+            w = 1 + rng.next_int(2)
+            h = 1 + rng.next_int(3)
+            for x in range(cx, min(cx + w, N)):
+                for z in range(cz, min(cz + h, N)):
+                    bits[x * N + z] |= BIT_SOLID
+
+    def _build_tunnels(self, bits, rng, worm_count, width):
+        cx = N // 2
+        cz = N // 2
+        bits[cx * N + cz] &= 0xFE
+        for _ in range(worm_count):
+            ang = rng.next_double() * math.pi * 2
+            x, z = cx, cz
+            steps = N + rng.next_int(N)
+            for _s in range(steps):
+                ang += (rng.next_double() - 0.5) * 1.3
+                c = math.cos(ang); sn = math.sin(ang)
+                if abs(c) >= abs(sn):
+                    sx = 1 if c >= 0 else -1; sz = 0
+                else:
+                    sx = 0; sz = 1 if sn >= 0 else -1
+                x = max(1, min(N - 2, x + sx))
+                z = max(1, min(N - 2, z + sz))
+                bits[x * N + z] &= 0xFE
+                if width > 1 and x + 1 <= N - 2:
+                    bits[(x + 1) * N + z] &= 0xFE
+
+    def _build_room_grid(self, bits, rng, cell):
+        for x in range(N):
+            for z in range(N):
+                if x % cell == 0 or z % cell == 0:
+                    bits[x * N + z] |= BIT_SOLID
+                else:
+                    bits[x * N + z] &= 0xFE
+        mid = cell // 2
+        for x in range(0, N, cell):
+            for z in range(mid, N, cell):
+                bits[x * N + z] &= 0xFE
+        for z in range(0, N, cell):
+            for x in range(mid, N, cell):
+                bits[x * N + z] &= 0xFE
+
+    def _build_hotel(self, bits, rng):
+        for i in range(N * N):
+            bits[i] = BIT_SOLID
+        for z in range(N):
+            if z % 5 == 0 or z % 5 == 1:
+                for x in range(N):
+                    bits[x * N + z] &= 0xFE
+        step = 4 + rng.next_int(3)
+        for x in range(2, N - 1, step):
+            for z in range(N):
+                bits[x * N + z] &= 0xFE
 
     def _build_ocean(self, bits, rng):
         for i in range(N * N):

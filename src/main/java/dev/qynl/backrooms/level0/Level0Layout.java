@@ -402,12 +402,22 @@ public final class Level0Layout {
         Arrays.fill(bits, (byte) BIT_SOLID);
         boolean[] room = new boolean[N * N];
 
-        if (level == 7) {
-            // Thalassophobia: not a maze at all - an open ocean dotted with rock islands.
-            buildOcean(bits, rng);
+        if (level == 1) {
+            buildWarehouse(bits, rng);          // Habitable Zone: open warehouse, pillar grid
+        } else if (level == 2) {
+            buildTunnels(bits, rng, 8, 1);      // Pipe Dreams: a dense warren of narrow tunnels
+        } else if (level == 3) {
+            buildRoomGrid(bits, rng, 7);        // Electrical Station: large machine rooms
+        } else if (level == 4) {
+            buildRoomGrid(bits, rng, 5);        // Abandoned Office: a grid of small rooms
+        } else if (level == 5) {
+            buildHotel(bits, rng);              // Terror Hotel: long halls with sealed rooms off them
+        } else if (level == 6) {
+            buildTunnels(bits, rng, 6, 1);      // Lights Out: a tight, dark warren
+        } else if (level == 7) {
+            buildOcean(bits, rng);              // Thalassophobia: open ocean, rock islands
         } else if (level == 8) {
-            // Cave System: organic caverns and meandering tunnels bored through solid rock.
-            buildCaves(bits, rng);
+            buildCaves(bits, rng);              // Cave System: organic caverns and tunnels
         } else {
             switch (style) {
                 case LONG -> buildLong(bits, rng);
@@ -872,6 +882,82 @@ public final class Level0Layout {
     }
 
     // ---- carving helpers -------------------------------------------------
+
+    /** Level 1 - Habitable Zone: a big open warehouse floor under a pillar grid, with storage blocks. */
+    private void buildWarehouse(byte[] bits, Random rng) {
+        Arrays.fill(bits, (byte) 0);
+        for (int x = 2; x < N - 1; x += 4) {
+            for (int z = 2; z < N - 1; z += 4) {
+                bits[x * N + z] |= (byte) BIT_PILLAR;
+            }
+        }
+        int blocks = 2 + rng.nextInt(3);
+        for (int i = 0; i < blocks; i++) {
+            int cx = 2 + rng.nextInt(N - 5), cz = 2 + rng.nextInt(N - 5);
+            int w = 1 + rng.nextInt(2), h = 1 + rng.nextInt(3);
+            for (int x = cx; x < cx + w && x < N; x++) {
+                for (int z = cz; z < cz + h && z < N; z++) {
+                    bits[x * N + z] |= (byte) BIT_SOLID;
+                }
+            }
+        }
+    }
+
+    /** Levels 2 & 6 - a warren of meandering tunnels bored from the centre (narrow, no chambers). */
+    private void buildTunnels(byte[] bits, Random rng, int wormCount, int width) {
+        int cx = N / 2, cz = N / 2;
+        bits[cx * N + cz] &= (byte) ~BIT_SOLID;
+        for (int w = 0; w < wormCount; w++) {
+            double ang = rng.nextDouble() * Math.PI * 2;
+            int x = cx, z = cz;
+            int steps = N + rng.nextInt(N);
+            for (int s = 0; s < steps; s++) {
+                ang += (rng.nextDouble() - 0.5) * 1.3;
+                // Step cardinally (never diagonally) so the 1-wide tunnel stays 4-connected.
+                int sx, sz;
+                if (Math.abs(Math.cos(ang)) >= Math.abs(Math.sin(ang))) {
+                    sx = Math.cos(ang) >= 0 ? 1 : -1; sz = 0;
+                } else {
+                    sx = 0; sz = Math.sin(ang) >= 0 ? 1 : -1;
+                }
+                x = Math.max(1, Math.min(N - 2, x + sx));
+                z = Math.max(1, Math.min(N - 2, z + sz));
+                bits[x * N + z] &= (byte) ~BIT_SOLID;
+                if (width > 1 && x + 1 <= N - 2) bits[(x + 1) * N + z] &= (byte) ~BIT_SOLID;
+            }
+        }
+    }
+
+    /** Levels 3 & 4 - a grid of rooms walled off from each other, linked by doorways. */
+    private void buildRoomGrid(byte[] bits, Random rng, int cell) {
+        for (int x = 0; x < N; x++) {
+            for (int z = 0; z < N; z++) {
+                if (x % cell == 0 || z % cell == 0) bits[x * N + z] |= (byte) BIT_SOLID;
+                else bits[x * N + z] &= (byte) ~BIT_SOLID;
+            }
+        }
+        int mid = cell / 2;
+        for (int x = 0; x < N; x += cell) {
+            for (int z = mid; z < N; z += cell) bits[x * N + z] &= (byte) ~BIT_SOLID;
+        }
+        for (int z = 0; z < N; z += cell) {
+            for (int x = mid; x < N; x += cell) bits[x * N + z] &= (byte) ~BIT_SOLID;
+        }
+    }
+
+    /** Level 5 - Terror Hotel: long parallel corridors, the sealed room-bands between them. */
+    private void buildHotel(byte[] bits, Random rng) {
+        Arrays.fill(bits, (byte) BIT_SOLID);
+        for (int z = 0; z < N; z++) {
+            if (z % 5 == 0 || z % 5 == 1) {
+                for (int x = 0; x < N; x++) bits[x * N + z] &= (byte) ~BIT_SOLID;
+            }
+        }
+        int step = 4 + rng.nextInt(3);
+        for (int x = 2; x < N - 1; x += step) {
+            for (int z = 0; z < N; z++) bits[x * N + z] &= (byte) ~BIT_SOLID;
+        }
+    }
 
     /**
      * Level 7 - Thalassophobia. The wiki's ocean: an open body of water (every tile open) broken only
