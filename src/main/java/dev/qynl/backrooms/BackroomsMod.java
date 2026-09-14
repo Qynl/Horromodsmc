@@ -2,6 +2,7 @@ package dev.qynl.backrooms;
 
 import dev.qynl.backrooms.command.BackroomsCommands;
 import dev.qynl.backrooms.horror.HorrorDirector;
+import dev.qynl.backrooms.level.BackroomsLevelBuilder;
 import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.light.LightFlickerSystem;
 import dev.qynl.backrooms.registry.ModBlockEntities;
@@ -42,6 +43,7 @@ public class BackroomsMod implements ModInitializer {
         BackroomsCommands.register();
 
         ServerTickEvents.END_SERVER_TICK.register(HorrorDirector::onServerTick);
+        ServerTickEvents.END_SERVER_TICK.register(BackroomsLevelBuilder::onServerTick);
         ServerTickEvents.END_SERVER_TICK.register(LightFlickerSystem::onServerTick);
     }
 

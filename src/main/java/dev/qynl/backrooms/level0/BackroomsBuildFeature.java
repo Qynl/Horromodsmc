@@ -37,22 +37,28 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
 
     @Override
     public boolean generate(FeatureContext<DefaultFeatureConfig> context) {
-        StructureWorldAccess world = context.getWorld();
-        BlockPos origin = context.getOrigin();
+        paintChunk(context.getWorld(), context.getOrigin().getX() >> 4, context.getOrigin().getZ() >> 4);
+        return true;
+    }
+
+    /** Paints one 16x16 chunk of this level from the layout. */
+    public void paintChunk(StructureWorldAccess world, int cx, int cz) {
         Level0Layout layout = Level0Holder.get(world.getSeed(), levelId);
-
-        int cx = origin.getX() >> 4;
-        int cz = origin.getZ() >> 4;
         BlockPos.Mutable mutable = new BlockPos.Mutable();
-
         for (int lx = 0; lx < 16; lx++) {
             for (int lz = 0; lz < 16; lz++) {
-                int x = (cx << 4) + lx;
-                int z = (cz << 4) + lz;
-                paintColumn(world, mutable, layout, x, z);
+                paintColumn(world, mutable, layout, (cx << 4) + lx, (cz << 4) + lz);
             }
         }
-        return true;
+    }
+
+    /**
+     * Paints a chunk for a level without going through worldgen. Superflat dimensions do not
+     * reliably run biome features, so {@code BackroomsLevelBuilder} calls this directly each tick
+     * to guarantee the level is actually built around the player.
+     */
+    public static void buildChunk(StructureWorldAccess world, int levelId, int cx, int cz) {
+        new BackroomsBuildFeature(levelId).paintChunk(world, cx, cz);
     }
 
     private void paintColumn(StructureWorldAccess world, BlockPos.Mutable mutable,
