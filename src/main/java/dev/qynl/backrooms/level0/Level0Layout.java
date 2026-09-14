@@ -273,7 +273,7 @@ public final class Level0Layout {
         long h = mix(seed, drift ^ PROP_SALT, x, z);
         int roll = (int) Math.floorMod(h >>> 17, 1000);
         // Crates and drums are the "resources" of the deeper levels, so clutter is denser there.
-        int base = level == 1 ? 42 : level == 2 ? 34 : level == 3 ? 30 : level == 4 ? 20 : 26;
+        int base = level == 1 ? 42 : level == 2 ? 34 : level == 3 ? 30 : level == 4 ? 20 : level == 5 ? 26 : level == 6 ? 12 : 26;
         int density = style(x, z) == Style.DARK ? base / 2 : base;
         if (roll >= density) return PROP_NONE;
         return 1 + (int) Math.floorMod(h >>> 29, PROP_COUNT);
@@ -368,6 +368,17 @@ public final class Level0Layout {
                 case HALL, HUB -> 2 + 3;                     // 5
                 default -> 2 + 2;                            // 4
             };
+        } else if (level == 5) {
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 4;                     // 6: ballroom height
+                case LONG -> 3;
+                default -> 2 + 3;                            // 5
+            };
+        } else if (level == 6) {
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 2;                     // 4
+                default -> 3;
+            };
         } else {
             ceilingY = switch (style) {
                 case HALL, HUB -> 2 + 4 + rng.nextInt(2);   // 6-7: high, echoing
@@ -424,6 +435,18 @@ public final class Level0Layout {
                 case HALL, HUB -> 5;
                 case LONG -> 4;
                 default -> 4;                    // bright, even office lighting
+            };
+        } else if (level == 5) {
+            spacing = switch (style) {
+                case HALL, HUB -> 6;
+                case LONG -> 5;
+                default -> 5 + rng.nextInt(2);   // warm, sparse hotel lighting
+            };
+        } else if (level == 6) {
+            spacing = switch (style) {
+                case HALL, HUB -> 10;
+                case LONG -> 9;
+                default -> 11 + rng.nextInt(3);  // almost never a working light
             };
         } else {
             spacing = switch (style) {
@@ -485,6 +508,26 @@ public final class Level0Layout {
             wHub = 0.08;
             wImpossible = 0.02;
             wPoolroom = 0.02;
+        } else if (level == 5) {
+            // Terror Hotel: long carpeted hallways, the odd ballroom, warm and dim.
+            wGrid = 0.34 - 0.10 * deep;
+            wOrganic = 0.20;
+            wHall = 0.12;
+            wDark = 0.06 + 0.10 * deep;
+            wLong = 0.16;
+            wHub = 0.06;
+            wImpossible = 0.04;
+            wPoolroom = 0.02;
+        } else if (level == 6) {
+            // Lights Out: pitch-black metal corridors, almost no light at all.
+            wGrid = 0.18;
+            wOrganic = 0.06;
+            wHall = 0.04;
+            wDark = 0.34 + 0.20 * deep;
+            wLong = 0.28 + 0.06 * deep;
+            wHub = 0.02;
+            wImpossible = 0.06 + 0.06 * deep;
+            wPoolroom = 0.0;
         } else {
             wGrid = 0.32 - 0.14 * deep;
             wOrganic = 0.26 - 0.08 * deep;

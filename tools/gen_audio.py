@@ -205,6 +205,22 @@ def hound_bark():
     s = np.tanh(np.sin(phase) * 4) * np.exp(-x * 10) + 0.4 * np.random.default_rng(24).standard_normal(x.size) * np.exp(-x * 20)
     emit("hound_bark", norm(s, 0.8))
 
+
+def skin_stealer_clack():
+    d = 0.18
+    x = t(d)
+    rng = np.random.default_rng(31)
+    s = np.sin(2 * np.pi * 1800 * x) * np.exp(-x * 60) + 0.6 * rng.standard_normal(x.size) * np.exp(-x * 80)
+    emit("skin_stealer_clack", norm(s, 0.8))
+
+def skin_stealer_reveal():
+    d = 1.0
+    x = t(d)
+    f = np.linspace(400, 1600, x.size)
+    phase = 2 * np.pi * np.cumsum(f) / SR
+    s = np.tanh(np.sin(phase) * 4) * np.exp(-x * 1.2) + 0.4 * np.random.default_rng(32).standard_normal(x.size) * np.exp(-x * 2)
+    emit("skin_stealer_reveal", norm(s, 0.9))
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     buzz(); hum(); drip()
@@ -214,6 +230,7 @@ def main():
     distant_noise(); wall_sound(); flicker(); thump(); tear_ambient()
     listener_idle(); listener_chase(); listener_step()
     smiler_idle(); smiler_chase(); hound_growl(); hound_bark()
+    skin_stealer_clack(); skin_stealer_reveal()
     names = sorted(f for f in os.listdir(OUT) if f.endswith(".ogg"))
     print("wrote", len(names), "ogg files:")
     for n in names:

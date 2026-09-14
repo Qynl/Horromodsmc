@@ -1,4 +1,4 @@
-# The Backrooms — Levels 0-4
+# The Backrooms — Levels 0-6
 
 A Fabric mod for **Minecraft 1.21.1** that adds a rare tear in the Overworld leading into an
 effectively endless, buzzing, yellow **Level 0** — and, deeper still, the damp concrete warehouse
@@ -67,6 +67,16 @@ carpet, **blacked-out windows**, and the occasional **water cooler** and vending
 wiki it is **mostly devoid of entities** — a rare, calm place to catch your breath. Source:
 backrooms-wiki.wikidot.com/level-4.
 
+### Level 5 — "Terror Hotel"
+An infinite, ornate **hotel**: long **red-carpeted hallways** lined with sealed wooden doors, beige
+wallpaper, pillars and warm, dim light, with the occasional ballroom. Deeper in it turns into a
+labyrinth. Home to Hounds, Smilers and **Skin-Stealers**. Source: backrooms-wiki.wikidot.com/level-5.
+
+### Level 6 — "Lights Out"
+**Pitch darkness.** Cold **metal corridors** wrapped in piping, almost never a working light, and an
+oppressive silence. You feel your way through; something in the dark feels its way toward you.
+Source: backrooms-wiki.wikidot.com/level-6.
+
 ### Getting deeper (the wiki's way in)
 - **Overworld → Level 0**: the rare **tear** in normal terrain — walk in.
 - **Level 0 → Level 1**: per the wiki, *"survive long enough to find a **flickering wall** to throw
@@ -76,16 +86,28 @@ backrooms-wiki.wikidot.com/level-4.
 - **Level 2 → Level 3**: per the wiki, *"unlocked doors on Level 2 commonly lead to Level 3."* Find
   one of the rare unlocked doors in the tunnels.
 - **Level 3 → Level 4**: per the wiki, you leave Level 3 *"using the elevator."* Find the elevator.
+- **Level 4 → Level 5**: per the wiki, *"find office-style stairways in Level 4."* Take a stairway
+  door down into the hotel.
+- **Level 5 → Level 6**: per the wiki, Level 6 is reached *"through the Boiler Room"* — the deeper,
+  darker you go, the more the hotel gives way to the dark. Find the boiler-room door.
+
+> **You cannot dig out.** Blocks cannot be broken anywhere inside the Backrooms — the only way down
+> is the way the level gives you.
 
 ### Monsters (sourced from the wiki)
 Each level's entities come from its wiki page:
 
 - **The Listener** (all levels) — blind; hunts by sound. **Sneaking is silent**, sprinting is a drum.
-- **Smiler** (Levels 1-3) — a grinning face that hangs in the dark and is **drawn to light and
+- **Smiler** (Levels 1-3, 5-6) — a grinning face that hangs in the dark and is **drawn to light and
   noise**. Bring a torch near it and it charges, screeching; contact hurts and it recoils.
-- **Hound** (Levels 1-3) — a humanoid dog that trots until it spots you, then runs you down. Per
+- **Hound** (Levels 1-3, 5-6) — a humanoid dog that trots until it spots you, then runs you down. Per
   the wiki's advice, **meet its eyes up close while making noise and it hesitates**, giving you a
   moment to back away.
+- **Skin-Stealer** (common on Level 3, rare elsewhere) — wears a stolen skin and **follows you like
+  another player, silent**, saying nothing. After a while its **head clacks over to the left, further
+  and further**, until the disguise splits and the thing underneath hunts you. **Alone it wears your
+  skin; in a group it wears the skin of whoever is furthest away** (or already dead), so the others
+  wave at a friend who isn't there.
 
 They are never always present, never a guaranteed kill, and gated behind the `listenerEnabled`
 config flag. Each level also runs the same psychological layer (phantom footsteps, dying lights,

@@ -49,5 +49,14 @@
   "block.backrooms.exit_door": "Unlocked Door",
   "block.backrooms.elevator": "Elevator",
   "backrooms.level3": "Level 3 - Electrical Station",
-  "backrooms.level4": "Level 4 - Abandoned Office"
+  "backrooms.level4": "Level 4 - Abandoned Office",
+  "entity.backrooms.skin_stealer": "Wanderer",
+  "subtitles.backrooms.skin_stealer_clack": "Bone clacks",
+  "subtitles.backrooms.skin_stealer_reveal": "Skin tears",
+  "block.backrooms.hotel_carpet": "Hotel Carpet",
+  "block.backrooms.hotel_wall": "Ornate Wallpaper",
+  "block.backrooms.stair_door": "Office Stairway",
+  "block.backrooms.boiler_door": "Boiler Room Door",
+  "backrooms.level5": "Level 5 - Terror Hotel",
+  "backrooms.level6": "Level 6 - Lights Out"
 }

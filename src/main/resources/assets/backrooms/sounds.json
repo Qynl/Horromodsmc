@@ -153,5 +153,21 @@
       }
     ],
     "subtitle": "subtitles.backrooms.hound_bark"
+  },
+  "skin_stealer_clack": {
+    "sounds": [
+      {
+        "name": "backrooms:skin_stealer_clack"
+      }
+    ],
+    "subtitle": "subtitles.backrooms.skin_stealer_clack"
+  },
+  "skin_stealer_reveal": {
+    "sounds": [
+      {
+        "name": "backrooms:skin_stealer_reveal"
+      }
+    ],
+    "subtitle": "subtitles.backrooms.skin_stealer_reveal"
   }
 }

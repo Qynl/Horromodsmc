@@ -28,6 +28,8 @@ public final class ModSoundEvents {
     public static final SoundEvent SMILER_CHASE = register("smiler_chase");
     public static final SoundEvent HOUND_GROWL = register("hound_growl");
     public static final SoundEvent HOUND_BARK = register("hound_bark");
+    public static final SoundEvent SKIN_STEALER_CLACK = register("skin_stealer_clack");
+    public static final SoundEvent SKIN_STEALER_REVEAL = register("skin_stealer_reveal");
 
     private static SoundEvent register(String id) {
         Identifier ident = Identifier.of(BackroomsMod.MOD_ID, id);

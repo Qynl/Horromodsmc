@@ -112,11 +112,13 @@ public final class HorrorDirector {
             lightOffBehind(world, player);
         } else if (cfg.glimpses && roll(0.0007 + 0.002 * paranoia)) {
             spawnGlimpse(world, player);
-        } else if (cfg.listenerEnabled && levelId >= 1 && levelId <= 3 && roll(0.0006 + 0.0014 * paranoia)) {
+        } else if (cfg.listenerEnabled && levelId != 4 && roll(skinStealerChance(levelId, paranoia))) {
+            spawnSkinStealer(world, player, levelId);
+        } else if (cfg.listenerEnabled && levelId >= 1 && levelId != 4 && roll(0.0006 + 0.0014 * paranoia)) {
             spawnSmiler(world, player, levelId);
-        } else if (cfg.listenerEnabled && levelId >= 1 && levelId <= 3 && roll(0.0004 + 0.0010 * paranoia)) {
+        } else if (cfg.listenerEnabled && levelId >= 1 && levelId != 4 && roll(0.0004 + 0.0010 * paranoia)) {
             spawnHound(world, player, levelId);
-        } else if (cfg.listenerEnabled && levelId <= 3 && roll(0.0005 + 0.0012 * paranoia)) {
+        } else if (cfg.listenerEnabled && levelId != 4 && roll(0.0005 + 0.0012 * paranoia)) {
             spawnListener(world, player, levelId);
         } else {
             return;
@@ -152,6 +154,25 @@ public final class HorrorDirector {
         BlockPos spawn = BackroomsSpawn.find(layout, tx, tz);
         SmilerEntity smiler = new SmilerEntity(world, spawn.getX() + 0.5, spawn.getY() + 1.2, spawn.getZ() + 0.5);
         world.spawnEntity(smiler);
+    }
+
+    /** Skin-Stealers are common on Level 3 and a rare, dreadful sight elsewhere. Never on Level 4. */
+    private static double skinStealerChance(int levelId, double paranoia) {
+        return levelId == 3 ? 0.0008 + 0.0016 * paranoia : 0.0002 + 0.0006 * paranoia;
+    }
+
+    private static void spawnSkinStealer(ServerWorld world, ServerPlayerEntity player, int levelId) {
+        if (!world.getEntitiesByType(ModEntityTypes.SKIN_STEALER, e -> true).isEmpty()) {
+            return;
+        }
+        Level0Layout layout = Level0Holder.get(world.getSeed(), levelId);
+        double ang = random.nextDouble() * Math.PI * 2;
+        double dist = 12 + random.nextDouble() * 8;
+        int tx = player.getBlockPos().getX() + (int) (Math.cos(ang) * dist);
+        int tz = player.getBlockPos().getZ() + (int) (Math.sin(ang) * dist);
+        BlockPos spawn = BackroomsSpawn.find(layout, tx, tz);
+        SkinStealerEntity stealer = new SkinStealerEntity(world, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5);
+        world.spawnEntity(stealer);
     }
 
     /** The Hound runs the halls of Levels 1 and 2; at most two at a time. */

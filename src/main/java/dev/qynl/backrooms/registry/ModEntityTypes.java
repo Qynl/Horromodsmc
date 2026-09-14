@@ -4,6 +4,7 @@ import dev.qynl.backrooms.BackroomsMod;
 import dev.qynl.backrooms.horror.GlimpseEntity;
 import dev.qynl.backrooms.horror.HoundEntity;
 import dev.qynl.backrooms.horror.ListenerEntity;
+import dev.qynl.backrooms.horror.SkinStealerEntity;
 import dev.qynl.backrooms.horror.SmilerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -41,6 +42,13 @@ public final class ModEntityTypes {
                             .dimensions(1.2f, 1.0f)
                             .makeFireImmune()
                             .build("hound"));
+
+    public static final EntityType<SkinStealerEntity> SKIN_STEALER =
+            Registry.register(Registries.ENTITY_TYPE, Identifier.of(BackroomsMod.MOD_ID, "skin_stealer"),
+                    EntityType.Builder.<SkinStealerEntity>create(SkinStealerEntity::new, SpawnGroup.MONSTER)
+                            .dimensions(0.6f, 1.8f)
+                            .makeFireImmune()
+                            .build("skin_stealer"));
 
     private ModEntityTypes() {
     }

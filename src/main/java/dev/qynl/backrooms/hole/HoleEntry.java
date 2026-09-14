@@ -27,7 +27,7 @@ public final class HoleEntry {
     public static final RegistryKey<World> LEVEL0 = BackroomsLevels.LEVEL_0.dimensionKey();
 
     /** The deepest level reachable. */
-    public static final int MAX_LEVEL = 4;
+    public static final int MAX_LEVEL = 6;
 
     /** The tear in the Overworld is the way into the Backrooms proper: it always opens on Level 0. */
     public static void enter(ServerPlayerEntity player, World from) {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The level registry. Levels 0-4 ship today; the mod is organised so that a further level is:
+ * The level registry. Levels 0-6 ship today; the mod is organised so that a further level is:
  *
  * <ol>
  *   <li>a new {@link LevelTheme} registered here,</li>
@@ -32,6 +32,12 @@ public final class BackroomsLevels {
     /** Level 4 - "Abandoned Office": an empty, well-lit office building. */
     public static final LevelTheme LEVEL_4 = new LevelTheme(4, "Level 4", "level4", "level4", 13159632, 11581632);
 
+    /** Level 5 - "Terror Hotel": ornate, dim, carpeted hotel hallways. */
+    public static final LevelTheme LEVEL_5 = new LevelTheme(5, "Level 5", "level5", "level5", 3811866, 1708552);
+
+    /** Level 6 - "Lights Out": pitch-black metal corridors. */
+    public static final LevelTheme LEVEL_6 = new LevelTheme(6, "Level 6", "level6", "level6", 328965, 131330);
+
     private static final Map<Integer, LevelTheme> LEVELS = new HashMap<>();
 
     static {
@@ -40,6 +46,8 @@ public final class BackroomsLevels {
         register(LEVEL_2);
         register(LEVEL_3);
         register(LEVEL_4);
+        register(LEVEL_5);
+        register(LEVEL_6);
     }
 
     public static void register(LevelTheme theme) {
@@ -56,6 +64,16 @@ public final class BackroomsLevels {
 
     public static java.util.Collection<LevelTheme> all() {
         return LEVELS.values();
+    }
+
+    /** True when the given dimension is one of the Backrooms levels. */
+    public static boolean isBackrooms(net.minecraft.registry.RegistryKey<net.minecraft.world.World> key) {
+        for (LevelTheme theme : LEVELS.values()) {
+            if (theme.dimensionKey().equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private BackroomsLevels() {

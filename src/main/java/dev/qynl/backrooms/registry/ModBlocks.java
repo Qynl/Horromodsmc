@@ -128,6 +128,22 @@ public final class ModBlocks {
                     .strength(-1.0f, 3600000.0f)
                     .sounds(SoundGroup.METAL), 4));
 
+    // Level 5 - Terror Hotel: red carpet and ornate wallpaper.
+    public static final Block HOTEL_CARPET = register("hotel_carpet", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.RED).strength(0.4f).sounds(SoundGroup.WOOL)));
+    public static final Block HOTEL_WALL = register("hotel_wall", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.TAN).strength(1.2f, 3.0f).sounds(SoundGroup.WOOD)));
+
+    // Ways down: an office stairway door (Level 4 -> 5) and a boiler-room door (Level 5 -> 6).
+    public static final Block STAIR_DOOR = register("stair_door", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.IRON_GRAY).noCollision()
+                    .strength(-1.0f, 3600000.0f).sounds(SoundGroup.METAL), 5));
+    public static final Block BOILER_DOOR = register("boiler_door", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.BLACK).noCollision()
+                    .strength(-1.0f, 3600000.0f).sounds(SoundGroup.METAL), 6));
+
     private static Block prop(float strength) {
         return new Block(AbstractBlock.Settings.create()
                 .mapColor(MapColor.GRAY)

@@ -305,6 +305,33 @@ def write_levels34():
     save(el, os.path.join(BLOCK, "elevator.png"))
 
 
+def write_skin_stealer():
+    """The Skin-Stealer: a pale borrowed face, and the raw thing underneath."""
+    # stalk form: pale skin, faint eyes and mouth in the head band (top-centre), torso below
+    img = np.tile(np.array([226, 208, 186], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 10
+    img[1:3, 5:7] = [46, 34, 32]
+    img[1:3, 9:11] = [46, 34, 32]
+    img[4, 6:10] = [110, 62, 60]
+    img[6:, :] *= 0.9
+    save(img, os.path.join(ENTITY, "skin_stealer.png"))
+    # revealed: dark, red eyes, gaping mouth
+    h = np.tile(np.array([58, 22, 22], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 12
+    h[1:3, 5:7] = [224, 32, 32]
+    h[1:3, 9:11] = [224, 32, 32]
+    h[3:5, 5:11] = [150, 18, 18]
+    save(h, os.path.join(ENTITY, "skin_stealer_hunt.png"))
+
+
+def write_levels56():
+    """Level 5 (Terror Hotel) palette: red carpet and ornate beige wallpaper."""
+    hc = np.tile(np.array([122, 32, 38], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 14
+    hc[::4, :] *= 0.85
+    save(hc, os.path.join(BLOCK, "hotel_carpet.png"))
+    hw = np.tile(np.array([198, 178, 142], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 10
+    hw[::8, :] *= 0.9
+    save(hw, os.path.join(BLOCK, "hotel_wall.png"))
+
+
 def main():
     write_props()
     write_listener()
@@ -319,6 +346,8 @@ def main():
     write_monsters()
     write_exits()
     write_levels34()
+    write_skin_stealer()
+    write_levels56()
     count = 0
     for root, _, files in os.walk(OUT):
         count += sum(1 for f in files if f.endswith(".png"))

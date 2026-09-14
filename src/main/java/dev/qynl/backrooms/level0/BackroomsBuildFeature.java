@@ -82,7 +82,7 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         }
 
         if (solid || pillar) {
-            BlockState wall = (pillar && (levelId == 2 || levelId == 3))
+            BlockState wall = (pillar && (levelId == 2 || levelId == 3 || levelId == 6))
                     ? ModBlocks.METAL.getDefaultState()
                     : (pillar && levelId == 4)
                             ? ModBlocks.CONCRETE.getDefaultState()
@@ -149,6 +149,13 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             // Office drywall, with the odd blacked-out window.
             return (wallWindowRoll(x, z) ? ModBlocks.OFFICE_WINDOW : ModBlocks.OFFICE_WALL).getDefaultState();
         }
+        if (levelId == 5) {
+            return ModBlocks.HOTEL_WALL.getDefaultState();
+        }
+        if (levelId == 6) {
+            // Lights Out: cold metal, here and there wrapped in piping.
+            return (!pillar && wallPipeRoll(x, z) ? ModBlocks.PIPE_WALL : ModBlocks.METAL).getDefaultState();
+        }
         if (!level0) {
             // Levels 2 and 3 carry heavy piping and wiring along their brick walls.
             if ((levelId == 2 || levelId == 3) && !pillar && wallPipeRoll(x, z)) {
@@ -163,6 +170,9 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         if (levelId == 4) {
             return ModBlocks.OFFICE_CARPET.getDefaultState();
         }
+        if (levelId == 5) {
+            return ModBlocks.HOTEL_CARPET.getDefaultState();
+        }
         return level0 ? withVariant(ModBlocks.CARPET.getDefaultState(), surface)
                 : ModBlocks.CONCRETE.getDefaultState();
     }
@@ -170,6 +180,12 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     private BlockState ceilingState(int surface, boolean level0) {
         if (levelId == 4) {
             return ModBlocks.OFFICE_WALL.getDefaultState();
+        }
+        if (levelId == 5) {
+            return ModBlocks.HOTEL_WALL.getDefaultState();
+        }
+        if (levelId == 6) {
+            return ModBlocks.METAL.getDefaultState();
         }
         return level0 ? withVariant(ModBlocks.CEILING_TILE.getDefaultState(), surface)
                 : ModBlocks.CONCRETE.getDefaultState();
@@ -217,6 +233,21 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
                 default -> ModBlocks.VENDING_MACHINE;
             };
         }
+        if (levelId == 5) {
+            return switch (prop) {
+                case Level0Layout.PROP_CHAIR -> ModBlocks.OFFICE_CHAIR;
+                case Level0Layout.PROP_DESK -> ModBlocks.DESK;
+                case Level0Layout.PROP_BARREL -> ModBlocks.WOOD_CRATE;
+                case Level0Layout.PROP_BOX -> ModBlocks.CARDBOARD_BOX;
+                default -> ModBlocks.VENDING_MACHINE;
+            };
+        }
+        if (levelId == 6) {
+            return switch (prop) {
+                case Level0Layout.PROP_BARREL -> ModBlocks.METAL_BARREL;
+                default -> ModBlocks.DEBRIS_PILE;
+            };
+        }
         return switch (prop) {
             case Level0Layout.PROP_CHAIR -> ModBlocks.OFFICE_CHAIR;
             case Level0Layout.PROP_DESK -> ModBlocks.DESK;
@@ -231,7 +262,19 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         if (levelId == 0 && flickerWallRoll(x, z)) return ModBlocks.FLICKER_WALL;
         if (levelId == 2 && exitDoorRoll(x, z)) return ModBlocks.EXIT_DOOR;
         if (levelId == 3 && elevatorRoll(x, z)) return ModBlocks.ELEVATOR;
+        if (levelId == 4 && stairDoorRoll(x, z)) return ModBlocks.STAIR_DOOR;
+        if (levelId == 5 && boilerDoorRoll(x, z)) return ModBlocks.BOILER_DOOR;
         return null;
+    }
+
+    private static boolean stairDoorRoll(int x, int z) {
+        long h = ((long) x * 0x9E3779B97F4A7C15L) ^ ((long) z * 0x100000001B3L);
+        return Math.floorMod(h >>> 23, 1000) < 4;
+    }
+
+    private static boolean boilerDoorRoll(int x, int z) {
+        long h = ((long) x * 0xBF58476D1CE4E5B9L) ^ ((long) z * 0xC6BC279692B5C323L);
+        return Math.floorMod(h >>> 19, 1000) < 3;
     }
 
     /** Rare, deterministic, so chunk borders agree on where the way down appears. */

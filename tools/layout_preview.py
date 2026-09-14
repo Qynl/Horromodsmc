@@ -168,7 +168,7 @@ class Level0Layout:
             return PROP_NONE
         h = mix(self.seed, self.drift ^ PROP_SALT, pack(x, z), 0)
         roll = (h >> 17) % 1000
-        base = 42 if self.level == 1 else (34 if self.level == 2 else (30 if self.level == 3 else (20 if self.level == 4 else 26)))
+        base = 42 if self.level == 1 else (34 if self.level == 2 else (30 if self.level == 3 else (20 if self.level == 4 else (26 if self.level == 5 else (12 if self.level == 6 else 26)))))
         density = base // 2 if self.style(x, z) == 3 else base
         if roll >= density:
             return PROP_NONE
@@ -242,6 +242,10 @@ class Level0Layout:
             ceiling_y = (2 + 4 + rng.next_int(2)) if style in (2, 5) else 3
         elif self.level == 4:
             ceiling_y = (2 + 3) if style in (2, 5) else (2 + 2)
+        elif self.level == 5:
+            ceiling_y = (2 + 4) if style in (2, 5) else (3 if style == 4 else (2 + 3))
+        elif self.level == 6:
+            ceiling_y = (2 + 2) if style in (2, 5) else 3
         else:
             if style in (2, 5):  # HALL, HUB
                 ceiling_y = 2 + 4 + rng.next_int(2)
@@ -279,6 +283,10 @@ class Level0Layout:
             spacing = 6 if style in (2, 5) else (4 if style == 4 else 5 + rng.next_int(3))
         elif self.level == 4:
             spacing = 5 if style in (2, 5) else (4 if style == 4 else 4)
+        elif self.level == 5:
+            spacing = 6 if style in (2, 5) else (5 if style == 4 else 5 + rng.next_int(2))
+        elif self.level == 6:
+            spacing = 10 if style in (2, 5) else (9 if style == 4 else 11 + rng.next_int(3))
         else:
             if style in (2, 5):
                 spacing = 6
@@ -304,6 +312,10 @@ class Level0Layout:
             weights = [0.20 - 0.06 * deep, 0.08, 0.10, 0.22 + 0.20 * deep, 0.30 + 0.06 * deep, 0.02, 0.06 + 0.06 * deep, 0.0]
         elif self.level == 4:
             weights = [0.40 - 0.10 * deep, 0.22, 0.14, 0.02, 0.10, 0.08, 0.02, 0.02]
+        elif self.level == 5:
+            weights = [0.34 - 0.10 * deep, 0.20, 0.12, 0.06 + 0.10 * deep, 0.16, 0.06, 0.04, 0.02]
+        elif self.level == 6:
+            weights = [0.18, 0.06, 0.04, 0.34 + 0.20 * deep, 0.28 + 0.06 * deep, 0.02, 0.06 + 0.06 * deep, 0.0]
         else:
             weights = [
                 0.32 - 0.14 * deep,   # GRID
