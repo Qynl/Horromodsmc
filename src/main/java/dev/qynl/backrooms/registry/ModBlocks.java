@@ -1,6 +1,7 @@
 package dev.qynl.backrooms.registry;
 
 import dev.qynl.backrooms.BackroomsMod;
+import dev.qynl.backrooms.hole.LevelExitBlock;
 import dev.qynl.backrooms.hole.RealityTearBlock;
 import dev.qynl.backrooms.level0.VariantBlock;
 import dev.qynl.backrooms.light.FluorescentLightBlock;
@@ -78,6 +79,21 @@ public final class ModBlocks {
     public static final Block DEBRIS_PILE = register("debris_pile", prop(0.4f));
     public static final Block MACHINERY = register("machinery", new Block(
             AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).strength(2.5f, 8.0f).sounds(SoundGroup.METAL)));
+
+    // Ways down, per the wiki: a flickering wall (Level 0 -> 1) and a too-long corridor (Level 1 -> 2).
+    public static final Block FLICKER_WALL = register("flicker_wall", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.YELLOW)
+                    .noCollision()
+                    .strength(-1.0f, 3600000.0f)
+                    .sounds(SoundGroup.WOOL), 1));
+
+    public static final Block DEEP_EXIT = register("deep_exit", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.BLACK)
+                    .noCollision()
+                    .strength(-1.0f, 3600000.0f)
+                    .sounds(SoundGroup.STONE), 2));
 
     private static Block prop(float strength) {
         return new Block(AbstractBlock.Settings.create()

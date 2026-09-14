@@ -26,12 +26,17 @@ public final class HoleEntry {
 
     public static final RegistryKey<World> LEVEL0 = BackroomsLevels.LEVEL_0.dimensionKey();
 
-    /** The deepest level the tear currently leads to. */
+    /** The deepest level reachable. */
     public static final int MAX_LEVEL = 2;
 
+    /** The tear in the Overworld is the way into the Backrooms proper: it always opens on Level 0. */
     public static void enter(ServerPlayerEntity player, World from) {
-        int target = nextLevel(from);
-        LevelTheme theme = BackroomsLevels.get(target);
+        goToLevel(player, 0);
+    }
+
+    /** Drops the player into the given level at its spawn, with the same quiet, unceremonious thump. */
+    public static void goToLevel(ServerPlayerEntity player, int levelId) {
+        LevelTheme theme = BackroomsLevels.get(levelId);
         if (theme == null) {
             return;
         }
@@ -39,21 +44,11 @@ public final class HoleEntry {
         if (dest == null) {
             return;
         }
-        Level0Layout layout = Level0Holder.get(dest.getSeed(), target);
+        Level0Layout layout = Level0Holder.get(dest.getSeed(), levelId);
         BlockPos spawn = BackroomsSpawn.find(layout, 0, 0);
         player.teleport(dest, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
                 EnumSet.noneOf(PositionFlag.class), player.getYaw(), player.getPitch());
         player.playSound(ModSoundEvents.THUMP, 0.12f, 0.7f);
-    }
-
-    /** From the Overworld the tear opens on Level 0; from a Backrooms level it sinks one level deeper. */
-    private static int nextLevel(World from) {
-        for (LevelTheme theme : BackroomsLevels.all()) {
-            if (from.getRegistryKey().equals(theme.dimensionKey())) {
-                return Math.min(MAX_LEVEL, theme.id() + 1);
-            }
-        }
-        return 0;
     }
 
     private HoleEntry() {

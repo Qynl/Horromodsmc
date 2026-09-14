@@ -38,5 +38,7 @@
   "subtitles.backrooms.smiler_idle": "Unsettling giggling",
   "subtitles.backrooms.smiler_chase": "Screech",
   "subtitles.backrooms.hound_growl": "Low growl",
-  "subtitles.backrooms.hound_bark": "Barking"
+  "subtitles.backrooms.hound_bark": "Barking",
+  "block.backrooms.flicker_wall": "Flickering Wall",
+  "block.backrooms.deep_exit": "Endless Corridor"
 }

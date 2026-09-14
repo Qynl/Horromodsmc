@@ -67,6 +67,16 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         mutable.set(x, Level0Layout.FLOOR_Y, z);
         world.setBlockState(mutable, floorState(surface, level0), 3);
 
+        // Level 0 -> Level 1: a rare wall that flickers and is not quite there. Throw yourself in.
+        if (levelId == 0 && solid && flickerWallRoll(x, z)) {
+            BlockState fw = ModBlocks.FLICKER_WALL.getDefaultState();
+            for (int y = Level0Layout.WALL_MIN_Y; y <= ceilingY; y++) {
+                mutable.set(x, y, z);
+                world.setBlockState(mutable, fw, 3);
+            }
+            return;
+        }
+
         if (solid || pillar) {
             BlockState wall = pillar && levelId == 2
                     ? ModBlocks.METAL.getDefaultState()
@@ -93,6 +103,13 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             }
         } else {
             world.setBlockState(mutable, ceilingState(surface, level0), 3);
+        }
+
+        // Level 1 -> Level 2: walk a corridor that runs on far longer than it should.
+        if (levelId == 1 && layout.style(x, z) == Level0Layout.Style.LONG && deepExitRoll(x, z)) {
+            mutable.set(x, Level0Layout.WALL_MIN_Y, z);
+            world.setBlockState(mutable, ModBlocks.DEEP_EXIT.getDefaultState(), 3);
+            return;
         }
 
         // Level-specific floor dressing and clutter.
@@ -163,6 +180,17 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             case Level0Layout.PROP_BOX -> ModBlocks.CARDBOARD_BOX;
             default -> ModBlocks.VENDING_MACHINE;
         };
+    }
+
+    /** Rare, deterministic, so chunk borders agree on where the way down appears. */
+    private static boolean flickerWallRoll(int x, int z) {
+        long h = ((long) x * 0xD1B54A32D192ED03L) ^ ((long) z * 0x0AEF1750FE6D5C3L);
+        return Math.floorMod(h >>> 29, 1000) < 4;
+    }
+
+    private static boolean deepExitRoll(int x, int z) {
+        long h = ((long) x * 0x9E3779B97F4A7C15L) ^ ((long) z * 0xBF58476D1CE4E5B9L);
+        return Math.floorMod(h >>> 31, 1000) < 6;
     }
 
     private static BlockState withVariant(BlockState state, int variant) {

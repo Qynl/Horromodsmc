@@ -44,16 +44,23 @@ and it recoils, giving you a window to run (loudly) or hide (quietly). After a w
 Different world seeds produce different Level 0s.
 
 ### Level 1 — "Habitable Zone"
-Reached by sinking through a second tear. A vast, humid **concrete warehouse**: wide pillar halls,
-tall ceilings and sparse, stuttering lights. The floor carries **puddles of stagnant water**, and
-the only resources are **supply crates** and **debris piles** left behind by whoever came before.
-Pipes run along the walls. Source: backrooms-wiki.wikidot.com/level-1.
+A vast, humid **concrete warehouse**: wide pillar halls, tall ceilings and sparse, stuttering
+lights. The floor carries **puddles of stagnant water**, and the only resources are **supply crates**
+and **debris piles** left behind by whoever came before. Pipes run along the walls. Source:
+backrooms-wiki.wikidot.com/level-1.
 
 ### Level 2 — "Abandoned Utility Halls"
-Deeper still: an infinite warren of **narrow brick-and-steel service tunnels** that contort at odd
-angles, lit by sparse, uneven fluorescents that leave long dark patches. Heavy **piping** lines the
-walls; **machinery**, oil drums and crates clutter the passages. Source:
+An infinite warren of **narrow brick-and-steel service tunnels** that contort at odd angles, lit by
+sparse, uneven fluorescents that leave long dark patches. Heavy **piping** lines the walls;
+**machinery**, oil drums and crates clutter the passages. Source:
 backrooms-wiki.wikidot.com/level-2.
+
+### Getting deeper (the wiki's way in)
+- **Overworld → Level 0**: the rare **tear** in normal terrain — walk in.
+- **Level 0 → Level 1**: per the wiki, *"survive long enough to find a **flickering wall** to throw
+  yourself through."* Rare sections of wall stutter and are not quite solid; step into one.
+- **Level 1 → Level 2**: per the wiki, Level 2 is reached by *"traversing down any corridors that
+  appear to go on for longer than most."* Follow an endless hallway far enough and it fades down.
 
 ### Monsters (sourced from the wiki)
 Each level's entities come from its wiki page:

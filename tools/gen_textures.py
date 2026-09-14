@@ -246,6 +246,26 @@ def write_monsters():
     save(img, os.path.join(ENTITY, "hound.png"))
 
 
+def write_exits():
+    """The two ways down: a flickering wall (animated) and a corridor that fades to black."""
+    # flicker_wall: 4-frame vertical strip that stutters between lit and dark
+    base = np.tile(np.array([201, 178, 88], float), (S, S, 1))
+    frames = []
+    for k, mul in enumerate([1.0, 0.7, 0.25, 1.12]):
+        f = base * mul + (noise() - 0.5)[:, :, None] * 18
+        if k in (2, 3):
+            f[5:7, :] *= 0.45          # a glitch band tearing across it
+        frames.append(f)
+    save(np.vstack(frames), os.path.join(BLOCK, "flicker_wall.png"))
+    # deep_exit: a passage mouth darkening toward the centre
+    d = np.tile(np.array([46, 46, 50], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 14
+    ys, xs = np.mgrid[0:S, 0:S]
+    cx = (xs - 7.5) / 7.5
+    cy = (ys - 7.5) / 7.5
+    d *= (0.3 + 0.7 * np.clip(np.sqrt(cx ** 2 + cy ** 2), 0, 1))[:, :, None]
+    save(d, os.path.join(BLOCK, "deep_exit.png"))
+
+
 def main():
     write_props()
     write_listener()
@@ -258,6 +278,7 @@ def main():
     write_glimpse()
     write_level_blocks()
     write_monsters()
+    write_exits()
     count = 0
     for root, _, files in os.walk(OUT):
         count += sum(1 for f in files if f.endswith(".png"))
