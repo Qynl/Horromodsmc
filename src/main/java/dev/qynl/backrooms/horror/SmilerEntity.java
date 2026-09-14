@@ -125,7 +125,7 @@ public class SmilerEntity extends Entity {
         if (attackCooldown <= 0) {
             for (PlayerEntity player : getWorld().getPlayers()) {
                 if (player.distanceTo(this) < 1.5) {
-                    player.damage(player.getDamageSources().mob(this), 7f);
+                    player.damage(player.getDamageSources().generic(), 7f);
                     Vec3d away = player.getPos().subtract(getPos()).normalize().multiply(0.7).add(0, 0.4, 0);
                     player.setVelocity(away);
                     attackCooldown = 30;

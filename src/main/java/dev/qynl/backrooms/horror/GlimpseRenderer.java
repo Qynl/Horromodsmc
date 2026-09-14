@@ -23,6 +23,11 @@ public class GlimpseRenderer extends EntityRenderer<GlimpseEntity> {
     }
 
     @Override
+    public Identifier getTexture(GlimpseEntity entity) {
+        return TEXTURE;
+    }
+
+    @Override
     public void render(GlimpseEntity entity, float yaw, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider vcp, int light) {
         matrices.push();

@@ -29,11 +29,6 @@ public class RealityTearBlock extends Block implements BlockEntityProvider {
     }
 
     @Override
-    public boolean isOpaque(BlockState state) {
-        return false;
-    }
-
-    @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new RealityTearBlockEntity(pos, state);
     }

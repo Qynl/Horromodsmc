@@ -23,6 +23,11 @@ public class HoundRenderer extends EntityRenderer<HoundEntity> {
     }
 
     @Override
+    public Identifier getTexture(HoundEntity entity) {
+        return TEXTURE;
+    }
+
+    @Override
     public void render(HoundEntity entity, float yaw, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider vcp, int light) {
         matrices.push();

@@ -84,19 +84,19 @@ public class SkinStealerEntity extends Entity {
 
     /** Picks who to wear: alone, you; in a group, whoever is furthest away (or already gone). */
     private ServerPlayerEntity chooseQuarry() {
-        List<ServerPlayerEntity> players = getWorld().getPlayers();
+        List<? extends PlayerEntity> players = getWorld().getPlayers();
         if (players.isEmpty()) return null;
-        if (players.size() == 1) return players.get(0);
-        ServerPlayerEntity farthest = players.get(0);
+        if (players.size() == 1) return (ServerPlayerEntity) players.get(0);
+        PlayerEntity farthest = players.get(0);
         double best = -1;
-        for (ServerPlayerEntity p : players) {
+        for (PlayerEntity p : players) {
             double d = p.distanceTo(this);
             if (d > best) {
                 best = d;
                 farthest = p;
             }
         }
-        return farthest;
+        return (ServerPlayerEntity) farthest;
     }
 
     @Override
@@ -160,7 +160,7 @@ public class SkinStealerEntity extends Entity {
         if (state == HUNT && attackCooldown <= 0 && quarry != null) {
             for (PlayerEntity player : getWorld().getPlayers()) {
                 if (player.distanceTo(this) < 1.5) {
-                    player.damage(player.getDamageSources().mob(this), 8f);
+                    player.damage(player.getDamageSources().generic(), 8f);
                     Vec3d away = player.getPos().subtract(getPos()).normalize().multiply(0.7).add(0, 0.4, 0);
                     player.setVelocity(away);
                     attackCooldown = 25;

@@ -23,6 +23,11 @@ public class ListenerRenderer extends EntityRenderer<ListenerEntity> {
     }
 
     @Override
+    public Identifier getTexture(ListenerEntity entity) {
+        return TEXTURE;
+    }
+
+    @Override
     public void render(ListenerEntity entity, float yaw, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider vcp, int light) {
         matrices.push();

@@ -160,7 +160,7 @@ public class ListenerEntity extends Entity {
         if (attackCooldown <= 0) {
             for (PlayerEntity player : getWorld().getPlayers()) {
                 if (player.distanceTo(this) < 1.4) {
-                    player.damage(player.getDamageSources().mob(this), 6f);
+                    player.damage(player.getDamageSources().generic(), 6f);
                     Vec3d away = player.getPos().subtract(getPos()).normalize().multiply(0.6).add(0, 0.4, 0);
                     player.setVelocity(away);
                     attackCooldown = 30;

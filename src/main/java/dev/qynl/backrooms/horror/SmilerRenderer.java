@@ -24,6 +24,11 @@ public class SmilerRenderer extends EntityRenderer<SmilerEntity> {
     }
 
     @Override
+    public Identifier getTexture(SmilerEntity entity) {
+        return TEXTURE;
+    }
+
+    @Override
     public void render(SmilerEntity entity, float yaw, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider vcp, int light) {
         matrices.push();
