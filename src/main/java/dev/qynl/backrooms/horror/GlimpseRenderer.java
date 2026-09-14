@@ -33,10 +33,10 @@ public class GlimpseRenderer extends EntityRenderer<GlimpseEntity> {
         float w = 0.35f;
         float h = 1.8f;
         int a = 110;
-        vc.vertex(m, -w, 0, 0).color(10, 10, 12, a).texture(0, 1).light(light).next();
-        vc.vertex(m, -w, h, 0).color(10, 10, 12, a).texture(0, 0).light(light).next();
-        vc.vertex(m, w, h, 0).color(10, 10, 12, a).texture(1, 0).light(light).next();
-        vc.vertex(m, w, 0, 0).color(10, 10, 12, a).texture(1, 1).light(light).next();
+        vc.vertex(m, -w, 0, 0).color(10, 10, 12, a).texture(0, 1).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -w, h, 0).color(10, 10, 12, a).texture(0, 0).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, h, 0).color(10, 10, 12, a).texture(1, 0).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, 0, 0).color(10, 10, 12, a).texture(1, 1).light(light).normal(0.0f, 0.0f, 1.0f);
 
         matrices.pop();
         super.render(entity, yaw, tickDelta, matrices, vcp, light);

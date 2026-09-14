@@ -37,10 +37,10 @@ public class SmilerRenderer extends EntityRenderer<SmilerEntity> {
         float h = 1.3f * pulse;
         float y0 = 0.3f;
         int a = 235;
-        vc.vertex(m, -w, y0, 0).color(255, 255, 235, a).texture(0, 1).light(15728640).next();
-        vc.vertex(m, -w, y0 + h, 0).color(255, 255, 235, a).texture(0, 0).light(15728640).next();
-        vc.vertex(m, w, y0 + h, 0).color(255, 255, 235, a).texture(1, 0).light(15728640).next();
-        vc.vertex(m, w, y0, 0).color(255, 255, 235, a).texture(1, 1).light(15728640).next();
+        vc.vertex(m, -w, y0, 0).color(255, 255, 235, a).texture(0, 1).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -w, y0 + h, 0).color(255, 255, 235, a).texture(0, 0).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, y0 + h, 0).color(255, 255, 235, a).texture(1, 0).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, y0, 0).color(255, 255, 235, a).texture(1, 1).light(15728640).normal(0.0f, 0.0f, 1.0f);
 
         matrices.pop();
         super.render(entity, yaw, tickDelta, matrices, vcp, light);

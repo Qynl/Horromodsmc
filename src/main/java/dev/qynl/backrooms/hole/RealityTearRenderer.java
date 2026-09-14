@@ -44,17 +44,17 @@ public class RealityTearRenderer implements BlockEntityRenderer<RealityTearBlock
 
     private void quadZ(VertexConsumer vc, Matrix4f m, int overlay, int light, float uv, int tint, int alpha) {
         float a = 0.12f, b = 0.88f, y0 = 0.05f, y1 = 0.95f, c = 0.5f;
-        vc.vertex(m, a, y0, c).color(tint, tint, 252, alpha).texture(uv, 1).overlay(overlay).light(light).next();
-        vc.vertex(m, a, y1, c).color(tint, tint, 252, alpha).texture(uv, 0).overlay(overlay).light(light).next();
-        vc.vertex(m, b, y1, c).color(tint, tint, 252, alpha).texture(1, 0).overlay(overlay).light(light).next();
-        vc.vertex(m, b, y0, c).color(tint, tint, 252, alpha).texture(1, 1).overlay(overlay).light(light).next();
+        vc.vertex(m, a, y0, c).color(tint, tint, 252, alpha).texture(uv, 1).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, a, y1, c).color(tint, tint, 252, alpha).texture(uv, 0).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, b, y1, c).color(tint, tint, 252, alpha).texture(1, 0).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, b, y0, c).color(tint, tint, 252, alpha).texture(1, 1).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
     }
 
     private void quadX(VertexConsumer vc, Matrix4f m, int overlay, int light, float uv, int tint, int alpha) {
         float a = 0.12f, b = 0.88f, y0 = 0.05f, y1 = 0.95f, c = 0.5f;
-        vc.vertex(m, c, y0, a).color(tint, tint, 252, alpha).texture(uv, 1).overlay(overlay).light(light).next();
-        vc.vertex(m, c, y1, a).color(tint, tint, 252, alpha).texture(uv, 0).overlay(overlay).light(light).next();
-        vc.vertex(m, c, y1, b).color(tint, tint, 252, alpha).texture(1, 0).overlay(overlay).light(light).next();
-        vc.vertex(m, c, y0, b).color(tint, tint, 252, alpha).texture(1, 1).overlay(overlay).light(light).next();
+        vc.vertex(m, c, y0, a).color(tint, tint, 252, alpha).texture(uv, 1).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, c, y1, a).color(tint, tint, 252, alpha).texture(uv, 0).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, c, y1, b).color(tint, tint, 252, alpha).texture(1, 0).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, c, y0, b).color(tint, tint, 252, alpha).texture(1, 1).overlay(overlay).light(light).normal(0.0f, 0.0f, 1.0f);
     }
 }

@@ -43,10 +43,10 @@ public class SkinStealerRenderer extends EntityRenderer<SkinStealerEntity> {
         float bw = 0.42f;
         float bh = 1.35f;
         int r = hunt ? 120 : 226, g = hunt ? 96 : 208, b = hunt ? 92 : 186, a = 245;
-        vc.vertex(m, -bw, 0, 0).color(r, g, b, a).texture(0, 1).light(full).next();
-        vc.vertex(m, -bw, bh, 0).color(r, g, b, a).texture(0, 0.35f).light(full).next();
-        vc.vertex(m, bw, bh, 0).color(r, g, b, a).texture(1, 0.35f).light(full).next();
-        vc.vertex(m, bw, 0, 0).color(r, g, b, a).texture(1, 1).light(full).next();
+        vc.vertex(m, -bw, 0, 0).color(r, g, b, a).texture(0, 1).light(full).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -bw, bh, 0).color(r, g, b, a).texture(0, 0.35f).light(full).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, bw, bh, 0).color(r, g, b, a).texture(1, 0.35f).light(full).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, bw, 0, 0).color(r, g, b, a).texture(1, 1).light(full).normal(0.0f, 0.0f, 1.0f);
 
         // Head, rolled to the left by the clack.
         matrices.translate(0, bh, 0);
@@ -55,10 +55,10 @@ public class SkinStealerRenderer extends EntityRenderer<SkinStealerEntity> {
         float hw = 0.30f;
         float hh = 0.42f;
         int hr = hunt ? 200 : 232, hg = hunt ? 40 : 214, hb = hunt ? 40 : 192;
-        vc.vertex(mh, -hw, 0, 0).color(hr, hg, hb, a).texture(0.25f, 0.35f).light(full).next();
-        vc.vertex(mh, -hw, hh, 0).color(hr, hg, hb, a).texture(0.25f, 0).light(full).next();
-        vc.vertex(mh, hw, hh, 0).color(hr, hg, hb, a).texture(0.75f, 0).light(full).next();
-        vc.vertex(mh, hw, 0, 0).color(hr, hg, hb, a).texture(0.75f, 0.35f).light(full).next();
+        vc.vertex(mh, -hw, 0, 0).color(hr, hg, hb, a).texture(0.25f, 0.35f).light(full).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(mh, -hw, hh, 0).color(hr, hg, hb, a).texture(0.25f, 0).light(full).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(mh, hw, hh, 0).color(hr, hg, hb, a).texture(0.75f, 0).light(full).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(mh, hw, 0, 0).color(hr, hg, hb, a).texture(0.75f, 0.35f).light(full).normal(0.0f, 0.0f, 1.0f);
 
         matrices.pop();
         super.render(entity, yaw, tickDelta, matrices, vcp, light);
