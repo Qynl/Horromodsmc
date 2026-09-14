@@ -6,7 +6,7 @@ import dev.qynl.backrooms.hole.HoleEntry;
 import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.level.LevelTheme;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.IntegerArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
