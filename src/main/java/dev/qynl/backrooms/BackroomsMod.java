@@ -1,5 +1,6 @@
 package dev.qynl.backrooms;
 
+import dev.qynl.backrooms.command.BackroomsCommands;
 import dev.qynl.backrooms.horror.HorrorDirector;
 import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.light.LightFlickerSystem;
@@ -37,6 +38,8 @@ public class BackroomsMod implements ModInitializer {
         // The Backrooms do not let you dig your way out: blocks cannot be broken inside them.
         PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) ->
                 !BackroomsLevels.isBackrooms(world.getRegistryKey()));
+
+        BackroomsCommands.register();
 
         ServerTickEvents.END_SERVER_TICK.register(HorrorDirector::onServerTick);
         ServerTickEvents.END_SERVER_TICK.register(LightFlickerSystem::onServerTick);
