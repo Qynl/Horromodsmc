@@ -221,7 +221,7 @@ public final class Level0Layout {
     public int landmarkAt(int x, int z) {
         int dx = Math.floorDiv(x, N);
         int dz = Math.floorDiv(z, N);
-        long h = mix(seed ^ ((long) dx * 0x9E3779B97F4A7C15L) ^ ((long) dz * 0xC2B2AE3D27D4EB4FL));
+        long h = mix(seed, dx, dz, 0x51ED270BL);
         if (Math.floorMod(h >>> 40, 100) >= 12) {
             return 0;
         }
