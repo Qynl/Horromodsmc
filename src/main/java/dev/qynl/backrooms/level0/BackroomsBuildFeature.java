@@ -75,6 +75,22 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         mutable.set(x, Level0Layout.FLOOR_Y, z);
         world.setBlockState(mutable, floorState(surface, level0), 3);
 
+        // Rare landmark: a tall monument column at the district centre.
+        int landmark = layout.landmarkAt(x, z);
+        if (landmark != 0) {
+            Block mon = (levelId == 7 || levelId == 8) ? ModBlocks.CONCRETE
+                    : (levelId == 5 ? ModBlocks.HOTEL_WALL
+                    : (levelId == 4 ? ModBlocks.OFFICE_WALL : ModBlocks.METAL));
+            for (int y = Level0Layout.WALL_MIN_Y; y < ceilingY; y++) {
+                mutable.set(x, y, z);
+                world.setBlockState(mutable, mon.getDefaultState(), 3);
+            }
+            mutable.set(x, ceilingY, z);
+            world.setBlockState(mutable,
+                    ModBlocks.FLUORESCENT_LIGHT.getDefaultState().with(FluorescentLightBlock.LIT, true), 3);
+            return;
+        }
+
         // Ways down that dress as part of the level (flickering wall, door, elevator).
         if (solid) {
             Block exit = exitBlockAt(x, z);

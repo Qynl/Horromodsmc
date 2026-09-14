@@ -213,6 +213,26 @@ public final class Level0Layout {
     }
 
     /** Raw encoded tile bits for a world column. */
+    /**
+     * Rare landmarks: about one district in eight gets a tall monument at its centre, a navigational
+     * reference point in the endless space. Returns 0 for none, else a 1..3 variant. Purely
+     * decorative - it does not change the solvable bits, so borders and connectivity are unaffected.
+     */
+    public int landmarkAt(int x, int z) {
+        int dx = Math.floorDiv(x, N);
+        int dz = Math.floorDiv(z, N);
+        long h = mix(seed ^ ((long) dx * 0x9E3779B97F4A7C15L) ^ ((long) dz * 0xC2B2AE3D27D4EB4FL));
+        if (Math.floorMod(h >>> 40, 100) >= 12) {
+            return 0;
+        }
+        int cx = dx * N + N / 2;
+        int cz = dz * N + N / 2;
+        if (x != cx || z != cz) {
+            return 0;
+        }
+        return 1 + (int) Math.floorMod(h >>> 20, 3);
+    }
+
     public int tileBits(int x, int z) {
         DistrictPlan plan = plan(x, z);
         return plan.bits[Math.floorMod(x, N) * N + Math.floorMod(z, N)] & 0xFF;
