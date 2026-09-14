@@ -1,0 +1,11 @@
+{
+  "textures": { "all": "backrooms:block/chair" },
+  "elements": [
+    { "from": [3,7,3], "to": [13,9,13], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"},"up":{"texture":"#all"},"down":{"texture":"#all"} } },
+    { "from": [3,9,11], "to": [13,16,13], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"},"up":{"texture":"#all"} } },
+    { "from": [3,0,3], "to": [5,7,5], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"} } },
+    { "from": [11,0,3], "to": [13,7,5], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"} } },
+    { "from": [3,0,11], "to": [5,7,13], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"} } },
+    { "from": [11,0,11], "to": [13,7,13], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"} } }
+  ]
+}

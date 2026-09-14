@@ -21,6 +21,9 @@ public final class ModSoundEvents {
     public static final SoundEvent FLICKER = register("flicker");
     public static final SoundEvent THUMP = register("thump");
     public static final SoundEvent TEAR_AMBIENT = register("tear_ambient");
+    public static final SoundEvent LISTENER_IDLE = register("listener_idle");
+    public static final SoundEvent LISTENER_CHASE = register("listener_chase");
+    public static final SoundEvent LISTENER_STEP = register("listener_step");
 
     private static SoundEvent register(String id) {
         Identifier ident = Identifier.of(BackroomsMod.MOD_ID, id);

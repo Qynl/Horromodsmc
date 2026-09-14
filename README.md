@@ -29,8 +29,22 @@ isolation, unreliable light and impossible architecture — rather than jumpscar
   gone when you look, corridors that are longer than you remember. Long stretches, *nothing happens*.
 - **Reality drift**: while you are elsewhere, the level slowly re-solves itself, so a room may not be
   where it was. Loaded chunks never change while on screen — the change is only ever discovered.
+- **Lived-in clutter**, placed sparsely and deterministically by the layout core: office chairs,
+  desks, metal barrels, cardboard boxes, the occasional vending machine, and security cameras hanging
+  from the ceiling. Never enough to feel stocked — just enough to feel *abandoned*.
+
+### The Listener
+A blind entity that only knows you by sound. It is **not** always present; it wanders, and it only
+pursues when it hears you. **Sprinting is loud**, walking is audible up close, and **sneaking is
+silent** — a sneaking player simply does not exist to it. It never guarantees a kill: contact hurts
+and it recoils, giving you a window to run (loudly) or hide (quietly). After a while it drifts off.
 
 Different world seeds produce different Level 0s.
+
+### Ready for more levels
+Levels are data + a small `LevelTheme`. Level 0 ships today; a deeper level is a new
+`LevelTheme` in `BackroomsLevels` plus `data/backrooms/dimension/levelN.json` and a biome — the
+generator, entry, drift, horror and lighting are all level-agnostic. See `BackroomsLevels.java`.
 
 ## Repository layout
 

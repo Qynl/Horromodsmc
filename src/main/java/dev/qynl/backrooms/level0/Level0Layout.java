@@ -59,11 +59,6 @@ public final class Level0Layout {
     /** First row of interior air / walls above the floor. */
     public static final int WALL_MIN_Y = 1;
 
-    /** Y of the walkable floor block (carpet). Players stand on top of it. */
-    public static final int FLOOR_Y = 0;
-    /** First interior air / wall row above the floor. */
-    public static final int WALL_MIN_Y = 1;
-
     private static final int N = DISTRICT_TILES;
 
     // ---- tile bit layout -------------------------------------------------
@@ -230,6 +225,54 @@ public final class Level0Layout {
     /** {@link #LIGHT_NONE}, {@link #LIGHT_WORKING}, {@link #LIGHT_FLICKERING} or {@link #LIGHT_DEAD}. */
     public int lightState(int x, int z) {
         return (tileBits(x, z) >> LIGHT_SHIFT) & LIGHT_MASK;
+    }
+
+    // ---- clutter ---------------------------------------------------------
+
+    public static final int PROP_NONE = 0;
+    public static final int PROP_CHAIR = 1;
+    public static final int PROP_DESK = 2;
+    public static final int PROP_BARREL = 3;
+    public static final int PROP_BOX = 4;
+    public static final int PROP_VENDING = 5;
+    public static final int PROP_COUNT = 5;
+
+    private static final long PROP_SALT = 0xA5A5A5A5C0FFEE01L;
+    private static final long CAMERA_SALT = 0xC4C4C4C4D10CA2L;
+
+    /**
+     * Sparse, deterministic clutter. Returns one of the {@code PROP_*} ids, or {@link #PROP_NONE}.
+     *
+     * <p>Props only ever land on open floor, never on doors or pillars, and never inside a 1-wide
+     * passage (detected by opposing solid neighbours), so a chair can never seal a corridor. Density
+     * is deliberately low: about 2-3% of eligible tiles, which reads as "someone left things here"
+     * rather than a furniture store.
+     */
+    public int propAt(int x, int z) {
+        int bits = tileBits(x, z);
+        if ((bits & BIT_SOLID) != 0) return PROP_NONE;
+        if ((bits & BIT_PILLAR) != 0) return PROP_NONE;
+        if ((bits & BIT_DOOR) != 0) return PROP_NONE;
+        boolean l = isSolid(x - 1, z);
+        boolean r = isSolid(x + 1, z);
+        boolean u = isSolid(x, z - 1);
+        boolean d = isSolid(x, z + 1);
+        if ((l && r) || (u && d)) return PROP_NONE;   // 1-wide passage: keep it clear
+
+        long h = mix(seed, drift ^ PROP_SALT, x, z);
+        int roll = (int) Math.floorMod(h >>> 17, 1000);
+        // Slightly denser in rooms/halls than in the deep dark, so clutter feels lived-in, not random.
+        int density = style(x, z) == Style.DARK ? 14 : 26;
+        if (roll >= density) return PROP_NONE;
+        return 1 + (int) Math.floorMod(h >>> 29, PROP_COUNT);
+    }
+
+    /** Rare hanging security camera on the ceiling. Purely atmospheric. */
+    public boolean cameraAt(int x, int z) {
+        int bits = tileBits(x, z);
+        if ((bits & BIT_SOLID) != 0 || (bits & BIT_PILLAR) != 0) return false;
+        long h = mix(seed, drift ^ CAMERA_SALT, x, z);
+        return Math.floorMod(h >>> 19, 1000) < 5;
     }
 
     /** Y of the ceiling block at this column. */

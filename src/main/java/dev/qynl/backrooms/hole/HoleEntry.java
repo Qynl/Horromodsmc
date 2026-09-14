@@ -1,6 +1,6 @@
 package dev.qynl.backrooms.hole;
 
-import dev.qynl.backrooms.BackroomsMod;
+import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.level0.BackroomsSpawn;
 import dev.qynl.backrooms.level0.Level0Holder;
 import dev.qynl.backrooms.level0.Level0Layout;
@@ -23,8 +23,7 @@ import java.util.EnumSet;
  */
 public final class HoleEntry {
 
-    public static final RegistryKey<World> LEVEL0 =
-            RegistryKey.of(RegistryKeys.WORLD, Identifier.of(BackroomsMod.MOD_ID, "level0"));
+    public static final RegistryKey<World> LEVEL0 = BackroomsLevels.LEVEL_0.dimensionKey();
 
     public static void enter(ServerPlayerEntity player, World from) {
         ServerWorld level0 = player.getServer().getWorld(LEVEL0);

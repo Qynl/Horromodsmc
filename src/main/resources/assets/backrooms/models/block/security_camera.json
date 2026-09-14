@@ -1,0 +1,8 @@
+{
+  "textures": { "all": "backrooms:block/camera" },
+  "elements": [
+    { "from": [7,14,7], "to": [9,16,9], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"} } },
+    { "from": [6,9,6], "to": [10,14,10], "faces": { "north":{"texture":"#all"},"south":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"},"up":{"texture":"#all"},"down":{"texture":"#all"} } },
+    { "from": [7,10,4], "to": [9,12,6], "faces": { "north":{"texture":"#all"},"east":{"texture":"#all"},"west":{"texture":"#all"},"down":{"texture":"#all"} } }
+  ]
+}

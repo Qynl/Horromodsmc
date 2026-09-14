@@ -3,6 +3,7 @@ package dev.qynl.backrooms.level0;
 import dev.qynl.backrooms.light.FluorescentLightBlock;
 import dev.qynl.backrooms.light.LightFlickerSystem;
 import dev.qynl.backrooms.registry.ModBlocks;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.state.property.IntProperty;
@@ -86,6 +87,28 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         } else {
             world.setBlockState(mutable, withVariant(ModBlocks.CEILING_TILE.getDefaultState(), surface), 3);
         }
+
+        // Sparse clutter: a chair, desk or barrel left where someone stopped using it, and the odd
+        // camera hanging from the ceiling. Kept rare on purpose.
+        int prop = layout.propAt(x, z);
+        if (prop != Level0Layout.PROP_NONE) {
+            mutable.set(x, Level0Layout.WALL_MIN_Y, z);
+            world.setBlockState(mutable, propBlock(prop).getDefaultState(), 3);
+        }
+        if (layout.cameraAt(x, z) && ceilingY - 1 > Level0Layout.WALL_MIN_Y) {
+            mutable.set(x, ceilingY - 1, z);
+            world.setBlockState(mutable, ModBlocks.SECURITY_CAMERA.getDefaultState(), 3);
+        }
+    }
+
+    private static Block propBlock(int prop) {
+        return switch (prop) {
+            case Level0Layout.PROP_CHAIR -> ModBlocks.OFFICE_CHAIR;
+            case Level0Layout.PROP_DESK -> ModBlocks.DESK;
+            case Level0Layout.PROP_BARREL -> ModBlocks.METAL_BARREL;
+            case Level0Layout.PROP_BOX -> ModBlocks.CARDBOARD_BOX;
+            default -> ModBlocks.VENDING_MACHINE;
+        };
     }
 
     private static BlockState withVariant(BlockState state, int variant) {

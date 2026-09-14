@@ -34,6 +34,10 @@ public final class BackroomsConfig {
     public float ambienceVolume = 1.0f;
     /** Whether distant lights can fail behind the player. */
     public boolean lightsFailBehind = true;
+    /** Whether the Listener (the blind, hearing-based entity) can appear. */
+    public boolean listenerEnabled = true;
+    /** How far the Listener can hear normal movement, in blocks. Sprinting multiplies this. */
+    public float listenerHearing = 14.0f;
 
     public static BackroomsConfig get() {
         if (INSTANCE == null) {

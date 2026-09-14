@@ -127,7 +127,58 @@ def write_glimpse():
     save(img, os.path.join(ENTITY, "glimpse.png"))
 
 
+def write_props():
+    # chair: dark worn fabric
+    chair = np.tile(np.array([58, 56, 52], float), (S, S, 1))
+    chair += (noise() - 0.5)[:, :, None] * 22
+    save(chair, os.path.join(BLOCK, "chair.png"))
+    # desk: pale laminate with scuffs
+    desk = np.tile(np.array([168, 150, 108], float), (S, S, 1))
+    desk += (noise() - 0.5)[:, :, None] * 16
+    desk[::5, :] *= 0.88
+    save(desk, os.path.join(BLOCK, "desk.png"))
+    # barrel: dull metal with rust
+    barrel = np.tile(np.array([104, 106, 108], float), (S, S, 1))
+    barrel += (noise() - 0.5)[:, :, None] * 18
+    rust = (noise() > 0.8)
+    barrel[rust, 0] *= 1.3; barrel[rust, 1] *= 0.7; barrel[rust, 2] *= 0.5
+    save(barrel, os.path.join(BLOCK, "barrel.png"))
+    # box: cardboard
+    box = np.tile(np.array([150, 116, 74], float), (S, S, 1))
+    box += (noise() - 0.5)[:, :, None] * 14
+    box[:, 7:9] *= 0.8
+    save(box, os.path.join(BLOCK, "box.png"))
+    # vending: front with buttons + glow, side plain
+    front = np.tile(np.array([150, 40, 46], float), (S, S, 1))
+    front[2:12, 2:10] = [210, 220, 215]      # lit window
+    front[2:12, 11:14] = [40, 40, 44]        # button panel
+    front += (noise() - 0.5)[:, :, None] * 8
+    save(front, os.path.join(BLOCK, "vending_front.png"))
+    side = np.tile(np.array([140, 36, 42], float), (S, S, 1))
+    side += (noise() - 0.5)[:, :, None] * 10
+    save(side, os.path.join(BLOCK, "vending_side.png"))
+    # camera: grey housing with red lens
+    cam = np.tile(np.array([70, 72, 76], float), (S, S, 1))
+    cam += (noise() - 0.5)[:, :, None] * 12
+    cam[7:9, 7:9] = [180, 30, 30]
+    save(cam, os.path.join(BLOCK, "camera.png"))
+
+
+def write_listener():
+    img = np.zeros((S, S, 4))
+    for x in range(S):
+        for z in range(S):
+            cx = abs(x - 7.5)
+            head = z < 4 and cx < 2
+            torso = 4 <= z < 15 and cx < (3.5 - z * 0.12)
+            if head or torso:
+                img[x, z] = [8, 8, 10, 255]
+    save(img, os.path.join(ENTITY, "listener.png"))
+
+
 def main():
+    write_props()
+    write_listener()
     for i in range(4):
         write_wallpaper(i)
         write_carpet(i)

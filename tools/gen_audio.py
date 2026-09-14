@@ -135,6 +135,29 @@ def thump():
     emit("thump", norm(s, 0.8))
 
 
+def listener_idle():
+    d = 1.5
+    x = t(d)
+    rng = np.random.default_rng(11)
+    breath = lowpass(rng.standard_normal(x.size), 0.02)
+    env = (np.sin(2 * np.pi * 0.7 * x) + 1) * 0.5
+    emit("listener_idle", norm(breath * env, 0.4))
+
+def listener_chase():
+    d = 0.9
+    x = t(d)
+    f = np.linspace(900, 180, x.size)
+    phase = 2 * np.pi * np.cumsum(f) / SR
+    s = np.tanh(np.sin(phase) * 3) * np.exp(-x * 2) + 0.3 * np.random.default_rng(12).standard_normal(x.size) * np.exp(-x * 4)
+    emit("listener_chase", norm(s, 0.8))
+
+def listener_step():
+    d = 0.22
+    x = t(d)
+    rng = np.random.default_rng(13)
+    s = lowpass(rng.standard_normal(x.size), 0.1) * np.exp(-x * 18) + 0.4 * np.sin(2 * np.pi * 70 * x) * np.exp(-x * 20)
+    emit("listener_step", norm(s, 0.7))
+
 def tear_ambient():
     d = 2.0
     x = t(d)
@@ -150,6 +173,7 @@ def main():
     step("carpet_step2", 0.14, 4, 0.55)
     step("phantom_footstep", 0.18, 8, 0.5)
     distant_noise(); wall_sound(); flicker(); thump(); tear_ambient()
+    listener_idle(); listener_chase(); listener_step()
     names = sorted(f for f in os.listdir(OUT) if f.endswith(".ogg"))
     print("wrote", len(names), "ogg files:")
     for n in names:

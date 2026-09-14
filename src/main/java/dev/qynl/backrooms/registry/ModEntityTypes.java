@@ -2,6 +2,7 @@ package dev.qynl.backrooms.registry;
 
 import dev.qynl.backrooms.BackroomsMod;
 import dev.qynl.backrooms.horror.GlimpseEntity;
+import dev.qynl.backrooms.horror.ListenerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
@@ -17,6 +18,13 @@ public final class ModEntityTypes {
                             .disableSaving()
                             .makeFireImmune()
                             .build("glimpse"));
+
+    public static final EntityType<ListenerEntity> LISTENER =
+            Registry.register(Registries.ENTITY_TYPE, Identifier.of(BackroomsMod.MOD_ID, "listener"),
+                    EntityType.Builder.<ListenerEntity>create(ListenerEntity::new, SpawnGroup.MONSTER)
+                            .dimensions(0.7f, 2.6f)
+                            .makeFireImmune()
+                            .build("listener"));
 
     private ModEntityTypes() {
     }

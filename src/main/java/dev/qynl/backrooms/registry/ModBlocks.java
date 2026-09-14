@@ -48,6 +48,28 @@ public final class ModBlocks {
                     .luminance(12)
                     .sounds(SoundGroup.GLASS)));
 
+    // Sparse, lived-in clutter. Non-opaque so they read as objects, not walls.
+    public static final Block OFFICE_CHAIR = register("office_chair", prop(0.5f));
+    public static final Block DESK = register("desk", prop(0.8f));
+    public static final Block METAL_BARREL = register("metal_barrel", prop(0.9f));
+    public static final Block CARDBOARD_BOX = register("cardboard_box", prop(0.3f));
+    public static final Block VENDING_MACHINE = register("vending_machine", prop(1.5f));
+    public static final Block SECURITY_CAMERA = register("security_camera", new Block(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.GRAY)
+                    .noCollision()
+                    .nonOpaque()
+                    .strength(0.4f)
+                    .sounds(SoundGroup.METAL)));
+
+    private static Block prop(float strength) {
+        return new Block(AbstractBlock.Settings.create()
+                .mapColor(MapColor.GRAY)
+                .strength(strength)
+                .nonOpaque()
+                .sounds(SoundGroup.WOOD));
+    }
+
     private static SoundGroup carpetGroup() {
         return new SoundGroup(0.9f, 0.9f,
                 ModSoundEvents.CARPET_BREAK,

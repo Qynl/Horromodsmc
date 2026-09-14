@@ -43,6 +43,11 @@ LIGHT_MASK = 3
 SURFACE_CLEAN, SURFACE_STAINED, SURFACE_DAMP, SURFACE_MOULDY = 0, 1, 2, 3
 LIGHT_NONE, LIGHT_WORKING, LIGHT_FLICKERING, LIGHT_DEAD = 0, 1, 2, 3
 
+PROP_NONE, PROP_CHAIR, PROP_DESK, PROP_BARREL, PROP_BOX, PROP_VENDING = 0, 1, 2, 3, 4, 5
+PROP_COUNT = 5
+PROP_SALT = 0xA5A5A5A5C0FFEE01
+CAMERA_SALT = 0xC4C4C4C4D10CA2
+
 STYLES = ["GRID", "ORGANIC", "HALL", "DARK", "LONG", "HUB", "IMPOSSIBLE", "POOLROOM"]
 
 
@@ -151,6 +156,28 @@ class Level0Layout:
 
     def light_state(self, x: int, z: int) -> int:
         return (self.tile_bits(x, z) >> LIGHT_SHIFT) & LIGHT_MASK
+
+    def prop_at(self, x: int, z: int) -> int:
+        b = self.tile_bits(x, z)
+        if b & BIT_SOLID or b & BIT_PILLAR or b & BIT_DOOR:
+            return PROP_NONE
+        l = self.is_solid(x - 1, z); r = self.is_solid(x + 1, z)
+        u = self.is_solid(x, z - 1); d = self.is_solid(x, z + 1)
+        if (l and r) or (u and d):
+            return PROP_NONE
+        h = mix(self.seed, self.drift ^ PROP_SALT, pack(x, z), 0)
+        roll = (h >> 17) % 1000
+        density = 14 if self.style(x, z) == 3 else 26
+        if roll >= density:
+            return PROP_NONE
+        return 1 + ((h >> 29) % PROP_COUNT)
+
+    def camera_at(self, x: int, z: int) -> bool:
+        b = self.tile_bits(x, z)
+        if b & BIT_SOLID or b & BIT_PILLAR:
+            return False
+        h = mix(self.seed, self.drift ^ CAMERA_SALT, pack(x, z), 0)
+        return ((h >> 19) % 1000) < 5
 
     def reliability(self, x: int, z: int) -> float:
         p = self.plan(x, z)
@@ -942,6 +969,19 @@ def render_map(layout: Level0Layout, path: str, tiles: int, scale: int, centre: 
                     c = LIGHT_FLICKER
                 elif light == 3:
                     c = LIGHT_DEAD
+                prop = layout.prop_at(wx, wz)
+                if prop == 1:
+                    c = (110, 70, 40)      # chair
+                elif prop == 2:
+                    c = (140, 100, 60)     # desk
+                elif prop == 3:
+                    c = (120, 60, 50)      # barrel
+                elif prop == 4:
+                    c = (170, 140, 90)     # box
+                elif prop == 5:
+                    c = (180, 40, 50)      # vending
+                if layout.camera_at(wx, wz):
+                    c = (255, 60, 60)      # camera
             for sx in range(scale):
                 for sz in range(scale):
                     px[x * scale + sx, z * scale + sz] = c

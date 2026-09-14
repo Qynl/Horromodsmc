@@ -10,5 +10,16 @@
   "subtitles.backrooms.phantom_footstep": "Footsteps approach",
   "subtitles.backrooms.distant_noise": "Something shifts far away",
   "subtitles.backrooms.flicker": "Light flickers",
-  "subtitles.backrooms.thump": "A quiet thump"
+  "subtitles.backrooms.thump": "A quiet thump",
+  "block.backrooms.office_chair": "Office Chair",
+  "block.backrooms.desk": "Office Desk",
+  "block.backrooms.metal_barrel": "Metal Barrel",
+  "block.backrooms.cardboard_box": "Cardboard Box",
+  "block.backrooms.vending_machine": "Vending Machine",
+  "block.backrooms.security_camera": "Security Camera",
+  "entity.backrooms.listener": "The Listener",
+  "entity.backrooms.glimpse": "Something",
+  "subtitles.backrooms.listener_idle": "A slow breath",
+  "subtitles.backrooms.listener_chase": "A shriek erupts",
+  "subtitles.backrooms.listener_step": "Heavy footsteps"
 }

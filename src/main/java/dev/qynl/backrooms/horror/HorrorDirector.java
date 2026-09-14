@@ -2,8 +2,11 @@ package dev.qynl.backrooms.horror;
 
 import dev.qynl.backrooms.config.BackroomsConfig;
 import dev.qynl.backrooms.hole.HoleEntry;
+import dev.qynl.backrooms.level0.BackroomsSpawn;
 import dev.qynl.backrooms.level0.Level0Holder;
+import dev.qynl.backrooms.level0.Level0Layout;
 import dev.qynl.backrooms.light.FluorescentLightBlock;
+import dev.qynl.backrooms.registry.ModEntityTypes;
 import dev.qynl.backrooms.registry.ModBlocks;
 import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.minecraft.block.BlockState;
@@ -101,10 +104,27 @@ public final class HorrorDirector {
             lightOffBehind(world, player);
         } else if (cfg.glimpses && roll(0.0007 + 0.002 * paranoia)) {
             spawnGlimpse(world, player);
+        } else if (cfg.listenerEnabled && roll(0.0005 + 0.0012 * paranoia)) {
+            spawnListener(world, player);
         } else {
             return;
         }
         lastEvent.put(player.getUuid(), tick);
+    }
+
+    /** At most one Listener at a time; it appears nearby and starts wandering, deaf until you make noise. */
+    private static void spawnListener(ServerWorld world, ServerPlayerEntity player) {
+        if (!world.getEntitiesByType(ModEntityTypes.LISTENER, e -> true).isEmpty()) {
+            return;
+        }
+        Level0Layout layout = Level0Holder.get(world.getSeed());
+        double ang = random.nextDouble() * Math.PI * 2;
+        double dist = 22 + random.nextDouble() * 10;
+        int tx = player.getBlockPos().getX() + (int) (Math.cos(ang) * dist);
+        int tz = player.getBlockPos().getZ() + (int) (Math.sin(ang) * dist);
+        BlockPos spawn = BackroomsSpawn.find(layout, tx, tz);
+        ListenerEntity listener = new ListenerEntity(world, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5);
+        world.spawnEntity(listener);
     }
 
     private static boolean roll(double chance) {
