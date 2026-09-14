@@ -46,7 +46,7 @@ public final class ModBlocks {
                     .noCollision()
                     .nonOpaque()
                     .strength(-1.0f, 3600000.0f)
-                    .luminance(12)
+                    .luminance(state -> 12)
                     .sounds(BlockSoundGroup.GLASS)));
 
     // Sparse, lived-in clutter. Non-opaque so they read as objects, not walls.
@@ -132,7 +132,7 @@ public final class ModBlocks {
     public static final Block HOTEL_CARPET = register("hotel_carpet", new Block(
             AbstractBlock.Settings.create().mapColor(MapColor.RED).strength(0.4f).sounds(BlockSoundGroup.WOOL)));
     public static final Block HOTEL_WALL = register("hotel_wall", new Block(
-            AbstractBlock.Settings.create().mapColor(MapColor.TAN).strength(1.2f, 3.0f).sounds(BlockSoundGroup.WOOD)));
+            AbstractBlock.Settings.create().mapColor(MapColor.BROWN).strength(1.2f, 3.0f).sounds(BlockSoundGroup.WOOD)));
 
     // Ways down: an office stairway door (Level 4 -> 5) and a boiler-room door (Level 5 -> 6).
     public static final Block STAIR_DOOR = register("stair_door", new LevelExitBlock(

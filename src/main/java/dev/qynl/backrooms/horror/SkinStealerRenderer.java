@@ -27,6 +27,11 @@ public class SkinStealerRenderer extends EntityRenderer<SkinStealerEntity> {
     }
 
     @Override
+    public Identifier getTexture(SkinStealerEntity entity) {
+        return SKIN;
+    }
+
+    @Override
     public void render(SkinStealerEntity entity, float yaw, float tickDelta, MatrixStack matrices,
                        VertexConsumerProvider vcp, int light) {
         boolean hunt = entity.skinState() == SkinStealerEntity.HUNT;

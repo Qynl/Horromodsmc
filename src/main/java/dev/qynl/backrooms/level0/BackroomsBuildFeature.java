@@ -1,5 +1,6 @@
 package dev.qynl.backrooms.level0;
 
+import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.light.FluorescentLightBlock;
 import dev.qynl.backrooms.light.LightFlickerSystem;
 import dev.qynl.backrooms.registry.ModBlocks;
@@ -110,7 +111,7 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             world.setBlockState(mutable,
                     ModBlocks.FLUORESCENT_LIGHT.getDefaultState().with(FluorescentLightBlock.LIT, lit), 3);
             if (lightState == Level0Layout.LIGHT_FLICKERING) {
-                LightFlickerSystem.registerFlicker(world.getRegistryKey(), mutable);
+                LightFlickerSystem.registerFlicker(BackroomsLevels.get(levelId).dimensionKey(), mutable);
             }
         } else {
             world.setBlockState(mutable, ceilingState(surface, level0), 3);

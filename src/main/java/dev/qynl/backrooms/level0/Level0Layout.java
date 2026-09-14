@@ -487,7 +487,7 @@ public final class Level0Layout {
     private Style chooseStyle(Random rng, int dx, int dz) {
         double dist = Math.sqrt((double) (dx * N) * (dx * N) + (double) (dz * N) * (dz * N));
         // Deep level: the lights give up and the geometry stops pretending to be a building.
-        float deep = (float) clamp01(dist / 12000.0);
+        float deep = clamp01((float) (dist / 12000.0));
 
         double wGrid, wOrganic, wHall, wDark, wLong, wHub, wImpossible, wPoolroom;
         if (level == 1) {

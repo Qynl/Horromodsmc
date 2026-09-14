@@ -1,6 +1,7 @@
 package dev.qynl.backrooms.audio;
 
 import net.minecraft.client.sound.AbstractSoundInstance;
+import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.random.Random;
@@ -13,12 +14,16 @@ public class BuzzSoundInstance extends AbstractSoundInstance {
 
     public BuzzSoundInstance(SoundEvent event, float volume, float pitch) {
         super(event, SoundCategory.AMBIENT, Random.create());
-        this.repeatType = RepeatType.ALWAYS;
         this.volume = volume;
         this.pitch = pitch;
         this.relative = true;
         this.x = 0;
         this.y = 0;
         this.z = 0;
+    }
+
+    @Override
+    public SoundInstance.RepeatType getRepeatType() {
+        return SoundInstance.RepeatType.ALWAYS;
     }
 }
