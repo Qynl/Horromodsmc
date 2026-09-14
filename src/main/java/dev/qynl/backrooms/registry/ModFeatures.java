@@ -12,7 +12,13 @@ import net.minecraft.world.gen.feature.Feature;
 public final class ModFeatures {
 
     public static final Feature<DefaultFeatureConfig> LEVEL0_BUILD =
-            register("level0_build", new BackroomsBuildFeature());
+            register("level0_build", new BackroomsBuildFeature(0));
+
+    public static final Feature<DefaultFeatureConfig> LEVEL1_BUILD =
+            register("level1_build", new BackroomsBuildFeature(1));
+
+    public static final Feature<DefaultFeatureConfig> LEVEL2_BUILD =
+            register("level2_build", new BackroomsBuildFeature(2));
 
     public static final Feature<DefaultFeatureConfig> REALITY_HOLE =
             register("reality_hole", new RealityHoleFeature());

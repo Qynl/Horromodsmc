@@ -21,5 +21,16 @@
   "entity.backrooms.glimpse": "Something",
   "subtitles.backrooms.listener_idle": "A slow breath",
   "subtitles.backrooms.listener_chase": "A shriek erupts",
-  "subtitles.backrooms.listener_step": "Heavy footsteps"
+  "subtitles.backrooms.listener_step": "Heavy footsteps",
+  "block.backrooms.concrete": "Concrete",
+  "block.backrooms.brick": "Utility Brick",
+  "block.backrooms.metal": "Steel Plating",
+  "block.backrooms.pipe_wall": "Piped Wall",
+  "block.backrooms.puddle": "Stagnant Puddle",
+  "block.backrooms.wood_crate": "Supply Crate",
+  "block.backrooms.debris_pile": "Debris Pile",
+  "block.backrooms.machinery": "Machinery",
+  "backrooms.level0": "Level 0 - The Hole",
+  "backrooms.level1": "Level 1 - Habitable Zone",
+  "backrooms.level2": "Level 2 - Abandoned Utility Halls"
 }

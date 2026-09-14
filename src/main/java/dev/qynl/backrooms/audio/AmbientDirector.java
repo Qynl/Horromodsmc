@@ -1,11 +1,14 @@
 package dev.qynl.backrooms.audio;
 
 import dev.qynl.backrooms.config.BackroomsConfig;
-import dev.qynl.backrooms.hole.HoleEntry;
+import dev.qynl.backrooms.level.BackroomsLevels;
+import dev.qynl.backrooms.level.LevelTheme;
 import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundInstance;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.world.World;
 import net.minecraft.util.math.random.Random;
 
 /**
@@ -26,7 +29,7 @@ public final class AmbientDirector {
             stopAll(client);
             return;
         }
-        boolean inLevel = HoleEntry.LEVEL0.equals(client.world.getRegistryKey());
+        boolean inLevel = isBackrooms(client.world.getRegistryKey());
         float master = BackroomsConfig.get().ambienceVolume;
 
         if (inLevel) {
@@ -102,6 +105,15 @@ public final class AmbientDirector {
                 // silence is also an event
             }
         }
+    }
+
+    private static boolean isBackrooms(RegistryKey<World> key) {
+        for (LevelTheme theme : BackroomsLevels.all()) {
+            if (theme.dimensionKey().equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private AmbientDirector() {

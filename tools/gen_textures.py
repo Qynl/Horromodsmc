@@ -176,6 +176,55 @@ def write_listener():
     save(img, os.path.join(ENTITY, "listener.png"))
 
 
+def write_level_blocks():
+    """Level 1 / Level 2 palette: concrete, brick, steel, piping, crates, debris, machinery, water."""
+    # concrete: cool grey with aggregate speckle
+    c = np.tile(np.array([118, 118, 120], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 26
+    save(c, os.path.join(BLOCK, "concrete.png"))
+    # brick: brown/black utility brick with offset courses
+    b = np.tile(np.array([74, 52, 44], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 18
+    ys, xs = np.mgrid[0:S, 0:S]
+    mortar = ((ys % 4) == 3) | (((xs + np.where((ys // 4) % 2, 4, 0)) % 8) == 7)
+    b[mortar] = [58, 50, 46]
+    save(b, os.path.join(BLOCK, "brick.png"))
+    # metal: riveted steel plate
+    m = np.tile(np.array([92, 92, 95], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 16
+    for rx in (2, 13):
+        for ry in (2, 13):
+            m[ry, rx] = [140, 140, 145]
+    save(m, os.path.join(BLOCK, "metal.png"))
+    # pipe_wall: steel with two horizontal pipes
+    pw = np.tile(np.array([70, 70, 72], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 12
+    for py in (4, 11):
+        pw[py - 1, :] = [150, 144, 138]
+        pw[py, :] = [110, 104, 98]
+        pw[py + 1, :] = [78, 72, 66]
+    save(pw, os.path.join(BLOCK, "pipe_wall.png"))
+    # wood_crate: planks with cross braces
+    w = np.tile(np.array([120, 92, 56], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 18
+    w[0, :] = [90, 62, 36]; w[15, :] = [90, 62, 36]
+    w[:, 0] = [90, 62, 36]; w[:, 15] = [90, 62, 36]
+    for i in range(S):
+        w[i, i] = [96, 66, 38]; w[i, 15 - i] = [96, 66, 38]
+    save(w, os.path.join(BLOCK, "wood_crate.png"))
+    # debris_pile: broken rubble and splinters
+    d = np.tile(np.array([70, 66, 62], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 30
+    rn = noise()
+    d[rn > 0.72] = [120, 92, 60]
+    d[rn < 0.2] = [58, 56, 54]
+    save(d, os.path.join(BLOCK, "debris_pile.png"))
+    # machinery: dark steel with gauges and a conduit
+    mc = np.tile(np.array([58, 58, 60], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 14
+    mc[8, 2:14] = [40, 40, 42]
+    for cx, cy in ((4, 4), (11, 12)):
+        mc[cy - 1:cy + 2, cx - 1:cx + 2] = [150, 140, 90]
+        mc[cy, cx] = [200, 60, 50]
+    save(mc, os.path.join(BLOCK, "machinery.png"))
+    # puddle: murky stagnant water
+    pu = np.tile(np.array([58, 66, 48], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 18
+    save(pu, os.path.join(BLOCK, "puddle.png"))
+
+
 def main():
     write_props()
     write_listener()
@@ -186,6 +235,7 @@ def main():
     write_light()
     write_void()
     write_glimpse()
+    write_level_blocks()
     count = 0
     for root, _, files in os.walk(OUT):
         count += sum(1 for f in files if f.endswith(".png"))

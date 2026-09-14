@@ -1,6 +1,8 @@
 package dev.qynl.backrooms.horror;
 
 import dev.qynl.backrooms.config.BackroomsConfig;
+import dev.qynl.backrooms.level.BackroomsLevels;
+import dev.qynl.backrooms.level.LevelTheme;
 import dev.qynl.backrooms.hole.HoleEntry;
 import dev.qynl.backrooms.level0.BackroomsSpawn;
 import dev.qynl.backrooms.level0.Level0Holder;
@@ -35,7 +37,7 @@ import java.util.UUID;
  */
 public final class HorrorDirector {
 
-    private record Pending(long atTick, Vec3d pos, SoundEvent event, float volume) {
+    private record Pending(ServerWorld world, long atTick, Vec3d pos, SoundEvent event, float volume) {
     }
 
     private static final Map<UUID, Long> lastEvent = new HashMap<>();
@@ -47,37 +49,43 @@ public final class HorrorDirector {
 
     public static void onServerTick(MinecraftServer server) {
         tick++;
-        ServerWorld level0 = server.getWorld(HoleEntry.LEVEL0);
-        if (level0 == null) {
-            return;
-        }
         BackroomsConfig cfg = BackroomsConfig.get();
+        runPending(server);
 
+        boolean driftDue = false;
         if (cfg.realityDrift) {
             long interval = Math.max(1, cfg.driftMinMinutes) * 60L * 20L;
             if (lastDriftTick < 0) {
                 lastDriftTick = tick;
             } else if (tick - lastDriftTick > interval) {
                 lastDriftTick = tick;
-                Level0Holder.advanceDrift(level0.getSeed());
+                driftDue = true;
             }
         }
 
-        runPending(server, level0);
-
-        for (ServerPlayerEntity player : level0.getPlayers()) {
-            maybeEvents(level0, player, cfg);
+        // Every registered Backrooms level runs the same psychological layer on its own layout.
+        for (LevelTheme theme : BackroomsLevels.all()) {
+            ServerWorld world = server.getWorld(theme.dimensionKey());
+            if (world == null) {
+                continue;
+            }
+            if (driftDue) {
+                Level0Holder.advanceDrift(world.getSeed(), theme.id());
+            }
+            for (ServerPlayerEntity player : world.getPlayers()) {
+                maybeEvents(world, player, cfg, theme.id());
+            }
         }
     }
 
-    private static void runPending(MinecraftServer server, ServerWorld level0) {
+    private static void runPending(MinecraftServer server) {
         if (pending.isEmpty()) {
             return;
         }
         for (int i = pending.size() - 1; i >= 0; i--) {
             Pending p = pending.get(i);
             if (tick >= p.atTick) {
-                level0.playSound(null, p.pos.x, p.pos.y, p.pos.z, p.event, SoundCategory.HOSTILE, p.volume, 1.0f);
+                p.world.playSound(null, p.pos.x, p.pos.y, p.pos.z, p.event, SoundCategory.HOSTILE, p.volume, 1.0f);
                 pending.remove(i);
             }
         }
@@ -89,7 +97,7 @@ public final class HorrorDirector {
         return Math.min(1.0, inLevel / (20.0 * 60.0 * 6.0));   // ramps over ~6 minutes
     }
 
-    private static void maybeEvents(ServerWorld world, ServerPlayerEntity player, BackroomsConfig cfg) {
+    private static void maybeEvents(ServerWorld world, ServerPlayerEntity player, BackroomsConfig cfg, int levelId) {
         long last = lastEvent.getOrDefault(player.getUuid(), 0L);
         if (tick - last < 20L * 15) {
             return;   // at least 15 quiet seconds between events
@@ -105,7 +113,7 @@ public final class HorrorDirector {
         } else if (cfg.glimpses && roll(0.0007 + 0.002 * paranoia)) {
             spawnGlimpse(world, player);
         } else if (cfg.listenerEnabled && roll(0.0005 + 0.0012 * paranoia)) {
-            spawnListener(world, player);
+            spawnListener(world, player, levelId);
         } else {
             return;
         }
@@ -113,11 +121,11 @@ public final class HorrorDirector {
     }
 
     /** At most one Listener at a time; it appears nearby and starts wandering, deaf until you make noise. */
-    private static void spawnListener(ServerWorld world, ServerPlayerEntity player) {
+    private static void spawnListener(ServerWorld world, ServerPlayerEntity player, int levelId) {
         if (!world.getEntitiesByType(ModEntityTypes.LISTENER, e -> true).isEmpty()) {
             return;
         }
-        Level0Layout layout = Level0Holder.get(world.getSeed());
+        Level0Layout layout = Level0Holder.get(world.getSeed(), levelId);
         double ang = random.nextDouble() * Math.PI * 2;
         double dist = 22 + random.nextDouble() * 10;
         int tx = player.getBlockPos().getX() + (int) (Math.cos(ang) * dist);
@@ -149,7 +157,7 @@ public final class HorrorDirector {
         int steps = 2 + random.nextInt(3);
         for (int i = 0; i < steps; i++) {
             Vec3d pos = base.add(random.nextDouble() - 0.5, 0, random.nextDouble() - 0.5);
-            pending.add(new Pending(tick + i * 6L, pos, ModSoundEvents.PHANTOM_FOOTSTEP, 0.35f));
+            pending.add(new Pending(world, tick + i * 6L, pos, ModSoundEvents.PHANTOM_FOOTSTEP, 0.35f));
         }
     }
 

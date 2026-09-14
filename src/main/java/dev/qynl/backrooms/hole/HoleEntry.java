@@ -1,6 +1,7 @@
 package dev.qynl.backrooms.hole;
 
 import dev.qynl.backrooms.level.BackroomsLevels;
+import dev.qynl.backrooms.level.LevelTheme;
 import dev.qynl.backrooms.level0.BackroomsSpawn;
 import dev.qynl.backrooms.level0.Level0Holder;
 import dev.qynl.backrooms.level0.Level0Layout;
@@ -25,16 +26,34 @@ public final class HoleEntry {
 
     public static final RegistryKey<World> LEVEL0 = BackroomsLevels.LEVEL_0.dimensionKey();
 
+    /** The deepest level the tear currently leads to. */
+    public static final int MAX_LEVEL = 2;
+
     public static void enter(ServerPlayerEntity player, World from) {
-        ServerWorld level0 = player.getServer().getWorld(LEVEL0);
-        if (level0 == null) {
+        int target = nextLevel(from);
+        LevelTheme theme = BackroomsLevels.get(target);
+        if (theme == null) {
             return;
         }
-        Level0Layout layout = Level0Holder.get(level0.getSeed());
+        ServerWorld dest = player.getServer().getWorld(theme.dimensionKey());
+        if (dest == null) {
+            return;
+        }
+        Level0Layout layout = Level0Holder.get(dest.getSeed(), target);
         BlockPos spawn = BackroomsSpawn.find(layout, 0, 0);
-        player.teleport(level0, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
+        player.teleport(dest, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
                 EnumSet.noneOf(PositionFlag.class), player.getYaw(), player.getPitch());
         player.playSound(ModSoundEvents.THUMP, 0.12f, 0.7f);
+    }
+
+    /** From the Overworld the tear opens on Level 0; from a Backrooms level it sinks one level deeper. */
+    private static int nextLevel(World from) {
+        for (LevelTheme theme : BackroomsLevels.all()) {
+            if (from.getRegistryKey().equals(theme.dimensionKey())) {
+                return Math.min(MAX_LEVEL, theme.id() + 1);
+            }
+        }
+        return 0;
     }
 
     private HoleEntry() {

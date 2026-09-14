@@ -1,0 +1,41 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "backrooms:block/puddle",
+    "water": "backrooms:block/puddle"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#water"
+        },
+        "down": {
+          "texture": "#water"
+        },
+        "north": {
+          "texture": "#water"
+        },
+        "south": {
+          "texture": "#water"
+        },
+        "east": {
+          "texture": "#water"
+        },
+        "west": {
+          "texture": "#water"
+        }
+      }
+    }
+  ]
+}

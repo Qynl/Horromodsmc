@@ -62,6 +62,23 @@ public final class ModBlocks {
                     .strength(0.4f)
                     .sounds(SoundGroup.METAL)));
 
+    // Level 1 / Level 2 structural palette: damp concrete warehouse and brick-and-steel utility tunnels.
+    public static final Block CONCRETE = register("concrete", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.GRAY).strength(1.8f, 6.0f).sounds(SoundGroup.STONE)));
+    public static final Block BRICK = register("brick", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.BROWN).strength(2.0f, 6.0f).sounds(SoundGroup.STONE)));
+    public static final Block METAL = register("metal", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).strength(3.0f, 9.0f).sounds(SoundGroup.METAL)));
+    public static final Block PIPE_WALL = register("pipe_wall", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).strength(2.5f, 8.0f).sounds(SoundGroup.METAL)));
+    public static final Block PUDDLE = register("puddle", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.WATER_BLUE)
+                    .noCollision().nonOpaque().strength(0.2f).sounds(SoundGroup.WET_GRASS)));
+    public static final Block WOOD_CRATE = register("wood_crate", prop(0.8f));
+    public static final Block DEBRIS_PILE = register("debris_pile", prop(0.4f));
+    public static final Block MACHINERY = register("machinery", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.IRON_GRAY).strength(2.5f, 8.0f).sounds(SoundGroup.METAL)));
+
     private static Block prop(float strength) {
         return new Block(AbstractBlock.Settings.create()
                 .mapColor(MapColor.GRAY)

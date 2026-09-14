@@ -1,8 +1,10 @@
-# The Backrooms — Level 0 ("The Hole")
+# The Backrooms — Levels 0, 1 & 2
 
 A Fabric mod for **Minecraft 1.21.1** that adds a rare tear in the Overworld leading into an
-effectively endless, buzzing, yellow **Level 0**. It is built around psychological horror —
-isolation, unreliable light and impossible architecture — rather than jumpscares or monsters.
+effectively endless, buzzing, yellow **Level 0** — and, deeper still, the damp concrete warehouse
+of **Level 1** and the narrow brick-and-steel utility tunnels of **Level 2**. It is built around
+psychological horror — isolation, unreliable light and impossible architecture — rather than
+jumpscares, with one stalker that hunts by sound.
 
 > "What the hell is this place?" → "I need to find a way out." → "Why does this place keep
 > changing?" → "I don't think I'm alone."
@@ -41,9 +43,26 @@ and it recoils, giving you a window to run (loudly) or hide (quietly). After a w
 
 Different world seeds produce different Level 0s.
 
-### Ready for more levels
-Levels are data + a small `LevelTheme`. Level 0 ships today; a deeper level is a new
-`LevelTheme` in `BackroomsLevels` plus `data/backrooms/dimension/levelN.json` and a biome — the
+### Level 1 — "Habitable Zone"
+Reached by sinking through a second tear. A vast, humid **concrete warehouse**: wide pillar halls,
+tall ceilings and sparse, stuttering lights. The floor carries **puddles of stagnant water**, and
+the only resources are **supply crates** and **debris piles** left behind by whoever came before.
+Pipes run along the walls. Source: backrooms-wiki.wikidot.com/level-1.
+
+### Level 2 — "Abandoned Utility Halls"
+Deeper still: an infinite warren of **narrow brick-and-steel service tunnels** that contort at odd
+angles, lit by sparse, uneven fluorescents that leave long dark patches. Heavy **piping** lines the
+walls; **machinery**, oil drums and crates clutter the passages. Source:
+backrooms-wiki.wikidot.com/level-2.
+
+### The Listener hunts every level
+The Listener is not confined to Level 0 — it stalks Levels 1 and 2 as well, so the deeper you go the
+less alone you are. Each level runs the same psychological layer (phantom footsteps, dying lights,
+glimpses, reality drift) on its own layout.
+
+### Adding further levels
+Levels are data + a small `LevelTheme`. A deeper level is a new `LevelTheme` in `BackroomsLevels`,
+a `data/backrooms/dimension/levelN.json` + biome, and a `BackroomsBuildFeature(N)` palette — the
 generator, entry, drift, horror and lighting are all level-agnostic. See `BackroomsLevels.java`.
 
 ## Repository layout

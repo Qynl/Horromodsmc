@@ -116,9 +116,10 @@ def s32(x: int) -> int:
 # Level0Layout
 # --------------------------------------------------------------------------
 class Level0Layout:
-    def __init__(self, seed: int, drift: int = 0):
+    def __init__(self, seed: int, drift: int = 0, level: int = 0):
         self.seed = seed & M64
         self.drift = drift & M64
+        self.level = level
         self.cache: dict[tuple[int, int], "DistrictPlan"] = {}
 
     def set_drift(self, drift: int) -> None:
@@ -167,7 +168,8 @@ class Level0Layout:
             return PROP_NONE
         h = mix(self.seed, self.drift ^ PROP_SALT, pack(x, z), 0)
         roll = (h >> 17) % 1000
-        density = 14 if self.style(x, z) == 3 else 26
+        base = 42 if self.level == 1 else (34 if self.level == 2 else 26)
+        density = base // 2 if self.style(x, z) == 3 else base
         if roll >= density:
             return PROP_NONE
         return 1 + ((h >> 29) % PROP_COUNT)
@@ -178,6 +180,15 @@ class Level0Layout:
             return False
         h = mix(self.seed, self.drift ^ CAMERA_SALT, pack(x, z), 0)
         return ((h >> 19) % 1000) < 5
+
+    def puddle_at(self, x: int, z: int) -> bool:
+        if self.level != 1:
+            return False
+        b = self.tile_bits(x, z)
+        if b & BIT_SOLID or b & BIT_PILLAR:
+            return False
+        h = mix(self.seed, self.drift ^ 0x9D1E0000AA11, pack(x, z), 0)
+        return ((h >> 21) % 1000) < 40
 
     def reliability(self, x: int, z: int) -> float:
         p = self.plan(x, z)
@@ -218,12 +229,22 @@ class Level0Layout:
         rng = JavaRandom(base)
         style = self._choose_style(rng, dx, dz)
 
-        if style in (2, 5):  # HALL, HUB
-            ceiling_y = 2 + 4 + rng.next_int(2)
-        elif style == 4:  # LONG
-            ceiling_y = 3
+        if self.level == 1:
+            if style in (2, 5):
+                ceiling_y = 2 + 5 + rng.next_int(2)
+            elif style == 4:
+                ceiling_y = 2 + 2
+            else:
+                ceiling_y = 2 + 3 + rng.next_int(2)
+        elif self.level == 2:
+            ceiling_y = 2 + 2 if style in (2, 5) else 3
         else:
-            ceiling_y = 2 + 2 + rng.next_int(2)
+            if style in (2, 5):  # HALL, HUB
+                ceiling_y = 2 + 4 + rng.next_int(2)
+            elif style == 4:  # LONG
+                ceiling_y = 3
+            else:
+                ceiling_y = 2 + 2 + rng.next_int(2)
 
         bits = bytearray([BIT_SOLID] * (N * N))
         room = [False] * (N * N)
@@ -246,12 +267,17 @@ class Level0Layout:
         if style == 6:
             _add_impossible_geometry(bits, rng)
 
-        if style in (2, 5):
-            spacing = 6
-        elif style == 4:
-            spacing = 4
+        if self.level == 1:
+            spacing = 7 if style in (2, 5) else (5 if style == 4 else 6 + rng.next_int(3))
+        elif self.level == 2:
+            spacing = 5 if style in (2, 5) else (4 if style == 4 else 5 + rng.next_int(3))
         else:
-            spacing = 4 + rng.next_int(3)
+            if style in (2, 5):
+                spacing = 6
+            elif style == 4:
+                spacing = 4
+            else:
+                spacing = 4 + rng.next_int(3)
         off_x = rng.next_int(spacing)
         off_z = rng.next_int(spacing)
         self._apply_lighting_and_surfaces(bits, dx, dz, spacing, off_x, off_z, style)
@@ -262,16 +288,21 @@ class Level0Layout:
         dist = math.sqrt((dx * N) ** 2 + (dz * N) ** 2)
         deep = max(0.0, min(1.0, dist / 12000.0))
 
-        weights = [
-            0.32 - 0.14 * deep,   # GRID
-            0.26 - 0.08 * deep,   # ORGANIC
-            0.09,                 # HALL
-            0.10 + 0.24 * deep,   # DARK
-            0.09 + 0.04 * deep,   # LONG
-            0.05,                 # HUB
-            0.04 + 0.10 * deep,   # IMPOSSIBLE
-            0.02,                 # POOLROOM
-        ]
+        if self.level == 1:
+            weights = [0.30 - 0.10 * deep, 0.18, 0.24, 0.10 + 0.20 * deep, 0.06, 0.07, 0.03, 0.02]
+        elif self.level == 2:
+            weights = [0.30 - 0.10 * deep, 0.08, 0.02, 0.16 + 0.22 * deep, 0.32 + 0.06 * deep, 0.01, 0.06 + 0.08 * deep, 0.02]
+        else:
+            weights = [
+                0.32 - 0.14 * deep,   # GRID
+                0.26 - 0.08 * deep,   # ORGANIC
+                0.09,                 # HALL
+                0.10 + 0.24 * deep,   # DARK
+                0.09 + 0.04 * deep,   # LONG
+                0.05,                 # HUB
+                0.04 + 0.10 * deep,   # IMPOSSIBLE
+                0.02,                 # POOLROOM
+            ]
         total = sum(weights)
         roll = rng.next_double() * total
         for i, w in enumerate(weights):

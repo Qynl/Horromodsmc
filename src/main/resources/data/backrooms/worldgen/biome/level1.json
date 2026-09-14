@@ -1,0 +1,31 @@
+{
+  "temperature": 0.8,
+  "downfall": 0.0,
+  "has_precipitation": false,
+  "effects": {
+    "fog_color": 7827824,
+    "sky_color": 5526612,
+    "water_color": 9145227,
+    "water_fog_color": 7368816,
+    "grass_color": 11119017,
+    "foliage_color": 11119017
+  },
+  "spawners": {},
+  "spawn_costs": {},
+  "carvers": {},
+  "features": [
+    [],
+    [],
+    [],
+    [
+      "backrooms:level1_build"
+    ],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+  ]
+}

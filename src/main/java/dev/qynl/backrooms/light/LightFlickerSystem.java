@@ -1,6 +1,7 @@
 package dev.qynl.backrooms.light;
 
-import dev.qynl.backrooms.hole.HoleEntry;
+import dev.qynl.backrooms.level.BackroomsLevels;
+import dev.qynl.backrooms.level.LevelTheme;
 import dev.qynl.backrooms.registry.ModBlocks;
 import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.minecraft.block.BlockState;
@@ -8,8 +9,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,39 +27,45 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class LightFlickerSystem {
 
-    private static final Set<BlockPos> FLICKERS = ConcurrentHashMap.newKeySet();
+    private static final Map<RegistryKey<World>, Set<BlockPos>> FLICKERS = new ConcurrentHashMap<>();
 
-    public static void registerFlicker(BlockPos pos) {
-        FLICKERS.add(pos.toImmutable());
+    public static void registerFlicker(RegistryKey<World> dim, BlockPos pos) {
+        FLICKERS.computeIfAbsent(dim, k -> ConcurrentHashMap.newKeySet()).add(pos.toImmutable());
     }
 
     public static void onServerTick(MinecraftServer server) {
         if ((server.getTicks() & 3) != 0) {
             return;   // only every 4th tick
         }
-        ServerWorld level0 = server.getWorld(HoleEntry.LEVEL0);
-        if (level0 == null || FLICKERS.isEmpty()) {
-            return;
-        }
-        for (ServerPlayerEntity player : level0.getPlayers()) {
-            BlockPos origin = player.getBlockPos();
-            for (BlockPos pos : FLICKERS) {
-                if (pos.getSquaredDistance(origin) > 24 * 24) {
-                    continue;
-                }
-                if (level0.getRandom().nextInt(30) != 0) {
-                    continue;   // sparse
-                }
-                BlockState state = level0.getBlockState(pos);
-                if (!state.isOf(ModBlocks.FLUORESCENT_LIGHT)) {
-                    FLICKERS.remove(pos);
-                    continue;
-                }
-                boolean lit = state.get(FluorescentLightBlock.LIT);
-                level0.setBlockState(pos, state.with(FluorescentLightBlock.LIT, !lit), 3);
-                if (lit) {
-                    level0.playSound(null, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5,
-                            ModSoundEvents.FLICKER, SoundCategory.BLOCKS, 0.15f, 1.0f);
+        for (LevelTheme theme : BackroomsLevels.all()) {
+            ServerWorld world = server.getWorld(theme.dimensionKey());
+            if (world == null) {
+                continue;
+            }
+            Set<BlockPos> flickers = FLICKERS.get(theme.dimensionKey());
+            if (flickers == null || flickers.isEmpty()) {
+                continue;
+            }
+            for (ServerPlayerEntity player : world.getPlayers()) {
+                BlockPos origin = player.getBlockPos();
+                for (BlockPos pos : flickers) {
+                    if (pos.getSquaredDistance(origin) > 24 * 24) {
+                        continue;
+                    }
+                    if (world.getRandom().nextInt(30) != 0) {
+                        continue;   // sparse
+                    }
+                    BlockState state = world.getBlockState(pos);
+                    if (!state.isOf(ModBlocks.FLUORESCENT_LIGHT)) {
+                        flickers.remove(pos);
+                        continue;
+                    }
+                    boolean lit = state.get(FluorescentLightBlock.LIT);
+                    world.setBlockState(pos, state.with(FluorescentLightBlock.LIT, !lit), 3);
+                    if (lit) {
+                        world.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                                ModSoundEvents.FLICKER, SoundCategory.BLOCKS, 0.15f, 1.0f);
+                    }
                 }
             }
         }

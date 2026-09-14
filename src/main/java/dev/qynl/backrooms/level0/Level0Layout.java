@@ -144,15 +144,21 @@ public final class Level0Layout {
 
     private final long seed;
     private volatile long drift;
+    private final int level;
     private final Map<Long, DistrictPlan> cache;
 
     public Level0Layout(long seed) {
-        this(seed, 0L);
+        this(seed, 0L, 0);
     }
 
     public Level0Layout(long seed, long drift) {
+        this(seed, drift, 0);
+    }
+
+    public Level0Layout(long seed, long drift, int level) {
         this.seed = seed;
         this.drift = drift;
+        this.level = level;
         // Small LRU: a single chunk touches at most 4 districts, so 256 entries is a lot of slack.
         final int maxEntries = 512;
         this.cache = java.util.Collections.synchronizedMap(
@@ -170,6 +176,11 @@ public final class Level0Layout {
 
     public long drift() {
         return drift;
+    }
+
+    /** Which Backrooms level this layout solves (0 = yellow rooms, 1 = habital concrete, 2 = pipes). */
+    public int level() {
+        return level;
     }
 
     /**
@@ -261,10 +272,22 @@ public final class Level0Layout {
 
         long h = mix(seed, drift ^ PROP_SALT, x, z);
         int roll = (int) Math.floorMod(h >>> 17, 1000);
-        // Slightly denser in rooms/halls than in the deep dark, so clutter feels lived-in, not random.
-        int density = style(x, z) == Style.DARK ? 14 : 26;
+        // Crates and drums are the "resources" of the deeper levels, so clutter is denser there.
+        int base = level == 1 ? 42 : level == 2 ? 34 : 26;
+        int density = style(x, z) == Style.DARK ? base / 2 : base;
         if (roll >= density) return PROP_NONE;
         return 1 + (int) Math.floorMod(h >>> 29, PROP_COUNT);
+    }
+
+    private static final long PUDDLE_SALT = 0x9D1E0000AA11L;
+
+    /** Level 1 only: a shallow puddle of stagnant liquid on open floor. Sparse and deniable. */
+    public boolean puddleAt(int x, int z) {
+        if (level != 1) return false;
+        int bits = tileBits(x, z);
+        if ((bits & BIT_SOLID) != 0 || (bits & BIT_PILLAR) != 0) return false;
+        long h = mix(seed, drift ^ PUDDLE_SALT, x, z);
+        return Math.floorMod(h >>> 21, 1000) < 40;
     }
 
     /** Rare hanging security camera on the ceiling. Purely atmospheric. */
@@ -318,11 +341,27 @@ public final class Level0Layout {
 
         Style style = chooseStyle(rng, dx, dz);
 
-        int ceilingY = switch (style) {
-            case HALL, HUB -> 2 + 4 + rng.nextInt(2);   // 6-7: high, echoing
-            case LONG -> 3;                              // interior of 2: oppressive
-            default -> 2 + 2 + rng.nextInt(2);           // 4-5
-        };
+        int ceilingY;
+        if (level == 1) {
+            // Warehouse-scale concrete: taller, echoing.
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 5 + rng.nextInt(2);   // 7-8
+                case LONG -> 2 + 2;                          // 4
+                default -> 2 + 3 + rng.nextInt(2);           // 5-6
+            };
+        } else if (level == 2) {
+            // Cramped utility tunnels: low.
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 2;   // 4
+                default -> 3;              // interior of 2: pipes overhead
+            };
+        } else {
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 4 + rng.nextInt(2);   // 6-7: high, echoing
+                case LONG -> 3;                              // interior of 2: oppressive
+                default -> 2 + 2 + rng.nextInt(2);           // 4-5
+            };
+        }
 
         byte[] bits = new byte[N * N];
         Arrays.fill(bits, (byte) BIT_SOLID);
@@ -348,11 +387,26 @@ public final class Level0Layout {
 
         // Lighting. Depends on nothing but position + reliability, so it can be queried per block
         // without a second pass.
-        int spacing = switch (style) {
-            case HALL, HUB -> 6;
-            case LONG -> 4;
-            default -> 4 + rng.nextInt(3);   // 4-6
-        };
+        int spacing;
+        if (level == 1) {
+            spacing = switch (style) {
+                case HALL, HUB -> 7;
+                case LONG -> 5;
+                default -> 6 + rng.nextInt(3);   // sparser, warehouse lighting
+            };
+        } else if (level == 2) {
+            spacing = switch (style) {
+                case HALL, HUB -> 5;
+                case LONG -> 4;
+                default -> 5 + rng.nextInt(3);   // uneven industrial strips
+            };
+        } else {
+            spacing = switch (style) {
+                case HALL, HUB -> 6;
+                case LONG -> 4;
+                default -> 4 + rng.nextInt(3);   // 4-6
+            };
+        }
         int offX = rng.nextInt(spacing);
         int offZ = rng.nextInt(spacing);
         applyLightingAndSurfaces(bits, dx, dz, spacing, offX, offZ, style);
@@ -365,14 +419,37 @@ public final class Level0Layout {
         // Deep level: the lights give up and the geometry stops pretending to be a building.
         float deep = (float) clamp01(dist / 12000.0);
 
-        double wGrid = 0.32 - 0.14 * deep;
-        double wOrganic = 0.26 - 0.08 * deep;
-        double wHall = 0.09;
-        double wDark = 0.10 + 0.24 * deep;
-        double wLong = 0.09 + 0.04 * deep;
-        double wHub = 0.05;
-        double wImpossible = 0.04 + 0.10 * deep;
-        double wPoolroom = 0.02;
+        double wGrid, wOrganic, wHall, wDark, wLong, wHub, wImpossible, wPoolroom;
+        if (level == 1) {
+            // Habitable Zone: wide pillar halls and warehouse rooms, fewer dead-ends.
+            wGrid = 0.30 - 0.10 * deep;
+            wOrganic = 0.18;
+            wHall = 0.24;
+            wDark = 0.10 + 0.20 * deep;
+            wLong = 0.06;
+            wHub = 0.07;
+            wImpossible = 0.03;
+            wPoolroom = 0.02;
+        } else if (level == 2) {
+            // Utility halls: narrow corridors and dark machinery runs, almost no open halls.
+            wGrid = 0.30 - 0.10 * deep;
+            wOrganic = 0.08;
+            wHall = 0.02;
+            wDark = 0.16 + 0.22 * deep;
+            wLong = 0.32 + 0.06 * deep;
+            wHub = 0.01;
+            wImpossible = 0.06 + 0.08 * deep;
+            wPoolroom = 0.02;
+        } else {
+            wGrid = 0.32 - 0.14 * deep;
+            wOrganic = 0.26 - 0.08 * deep;
+            wHall = 0.09;
+            wDark = 0.10 + 0.24 * deep;
+            wLong = 0.09 + 0.04 * deep;
+            wHub = 0.05;
+            wImpossible = 0.04 + 0.10 * deep;
+            wPoolroom = 0.02;
+        }
 
         double total = wGrid + wOrganic + wHall + wDark + wLong + wHub + wImpossible + wPoolroom;
         double roll = rng.nextDouble() * total;
