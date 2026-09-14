@@ -21,7 +21,8 @@ import net.minecraft.world.gen.feature.util.FeatureContext;
  * chunk in the flat dimension, and because the layout is a pure function of (seed, drift, level,
  * column), chunks agree on their shared borders without any cross-chunk state. The block palette is
  * chosen by {@code levelId}: Level 0 is the yellow wallpaper maze, Level 1 a damp concrete
- * warehouse, Level 2 a narrow brick-and-steel utility tunnel.
+ * warehouse, Level 2 a narrow brick-and-steel utility tunnel, Level 3 a wired brick electrical
+ * station, Level 4 an empty office.
  */
 public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
 
@@ -67,20 +68,25 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         mutable.set(x, Level0Layout.FLOOR_Y, z);
         world.setBlockState(mutable, floorState(surface, level0), 3);
 
-        // Level 0 -> Level 1: a rare wall that flickers and is not quite there. Throw yourself in.
-        if (levelId == 0 && solid && flickerWallRoll(x, z)) {
-            BlockState fw = ModBlocks.FLICKER_WALL.getDefaultState();
-            for (int y = Level0Layout.WALL_MIN_Y; y <= ceilingY; y++) {
-                mutable.set(x, y, z);
-                world.setBlockState(mutable, fw, 3);
+        // Ways down that dress as part of the level (flickering wall, door, elevator).
+        if (solid) {
+            Block exit = exitBlockAt(x, z);
+            if (exit != null) {
+                BlockState es = exit.getDefaultState();
+                for (int y = Level0Layout.WALL_MIN_Y; y <= ceilingY; y++) {
+                    mutable.set(x, y, z);
+                    world.setBlockState(mutable, es, 3);
+                }
+                return;
             }
-            return;
         }
 
         if (solid || pillar) {
-            BlockState wall = pillar && levelId == 2
+            BlockState wall = (pillar && (levelId == 2 || levelId == 3))
                     ? ModBlocks.METAL.getDefaultState()
-                    : wallState(surface, level0, x, z, pillar);
+                    : (pillar && levelId == 4)
+                            ? ModBlocks.CONCRETE.getDefaultState()
+                            : wallState(surface, level0, x, z, pillar);
             for (int y = Level0Layout.WALL_MIN_Y; y <= ceilingY; y++) {
                 mutable.set(x, y, z);
                 world.setBlockState(mutable, wall, 3);
@@ -112,6 +118,16 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             return;
         }
 
+        // Level 3: rusty bars blocking the hall (passable, but you feel them).
+        if (levelId == 3 && metalBarsRoll(x, z)) {
+            BlockState bars = ModBlocks.METAL_BARS.getDefaultState();
+            for (int y = Level0Layout.WALL_MIN_Y; y < ceilingY; y++) {
+                mutable.set(x, y, z);
+                world.setBlockState(mutable, bars, 3);
+            }
+            return;
+        }
+
         // Level-specific floor dressing and clutter.
         int prop = layout.propAt(x, z);
         if (prop != Level0Layout.PROP_NONE) {
@@ -129,9 +145,13 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     }
 
     private BlockState wallState(int surface, boolean level0, int x, int z, boolean pillar) {
+        if (levelId == 4) {
+            // Office drywall, with the odd blacked-out window.
+            return (wallWindowRoll(x, z) ? ModBlocks.OFFICE_WINDOW : ModBlocks.OFFICE_WALL).getDefaultState();
+        }
         if (!level0) {
-            // Level 2 utility tunnels carry heavy piping along their walls.
-            if (levelId == 2 && !pillar && wallPipeRoll(x, z)) {
+            // Levels 2 and 3 carry heavy piping and wiring along their brick walls.
+            if ((levelId == 2 || levelId == 3) && !pillar && wallPipeRoll(x, z)) {
                 return ModBlocks.PIPE_WALL.getDefaultState();
             }
             return (levelId == 1 ? ModBlocks.CONCRETE : ModBlocks.BRICK).getDefaultState();
@@ -140,11 +160,17 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     }
 
     private BlockState floorState(int surface, boolean level0) {
+        if (levelId == 4) {
+            return ModBlocks.OFFICE_CARPET.getDefaultState();
+        }
         return level0 ? withVariant(ModBlocks.CARPET.getDefaultState(), surface)
                 : ModBlocks.CONCRETE.getDefaultState();
     }
 
     private BlockState ceilingState(int surface, boolean level0) {
+        if (levelId == 4) {
+            return ModBlocks.OFFICE_WALL.getDefaultState();
+        }
         return level0 ? withVariant(ModBlocks.CEILING_TILE.getDefaultState(), surface)
                 : ModBlocks.CONCRETE.getDefaultState();
     }
@@ -173,6 +199,24 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
                 default -> ModBlocks.CARDBOARD_BOX;
             };
         }
+        if (levelId == 3) {
+            return switch (prop) {
+                case Level0Layout.PROP_CHAIR -> ModBlocks.MACHINERY;
+                case Level0Layout.PROP_DESK -> ModBlocks.METAL_BARREL;
+                case Level0Layout.PROP_BARREL -> ModBlocks.WOOD_CRATE;
+                case Level0Layout.PROP_BOX -> ModBlocks.DEBRIS_PILE;
+                default -> ModBlocks.MACHINERY;
+            };
+        }
+        if (levelId == 4) {
+            return switch (prop) {
+                case Level0Layout.PROP_CHAIR -> ModBlocks.OFFICE_CHAIR;
+                case Level0Layout.PROP_DESK -> ModBlocks.DESK;
+                case Level0Layout.PROP_BARREL -> ModBlocks.WATER_COOLER;
+                case Level0Layout.PROP_BOX -> ModBlocks.CARDBOARD_BOX;
+                default -> ModBlocks.VENDING_MACHINE;
+            };
+        }
         return switch (prop) {
             case Level0Layout.PROP_CHAIR -> ModBlocks.OFFICE_CHAIR;
             case Level0Layout.PROP_DESK -> ModBlocks.DESK;
@@ -180,6 +224,14 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
             case Level0Layout.PROP_BOX -> ModBlocks.CARDBOARD_BOX;
             default -> ModBlocks.VENDING_MACHINE;
         };
+    }
+
+    /** The way down for this level, or null where this column is ordinary wall. */
+    private Block exitBlockAt(int x, int z) {
+        if (levelId == 0 && flickerWallRoll(x, z)) return ModBlocks.FLICKER_WALL;
+        if (levelId == 2 && exitDoorRoll(x, z)) return ModBlocks.EXIT_DOOR;
+        if (levelId == 3 && elevatorRoll(x, z)) return ModBlocks.ELEVATOR;
+        return null;
     }
 
     /** Rare, deterministic, so chunk borders agree on where the way down appears. */
@@ -191,6 +243,26 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     private static boolean deepExitRoll(int x, int z) {
         long h = ((long) x * 0x9E3779B97F4A7C15L) ^ ((long) z * 0xBF58476D1CE4E5B9L);
         return Math.floorMod(h >>> 31, 1000) < 6;
+    }
+
+    private static boolean exitDoorRoll(int x, int z) {
+        long h = ((long) x * 0xC6BC279692B5C323L) ^ ((long) z * 0x9E3779B97F4A7C15L);
+        return Math.floorMod(h >>> 27, 1000) < 4;
+    }
+
+    private static boolean elevatorRoll(int x, int z) {
+        long h = ((long) x * 0x100000001B3L) ^ ((long) z * 0xC2B2AE3D27D4EB4FL);
+        return Math.floorMod(h >>> 25, 1000) < 3;
+    }
+
+    private static boolean metalBarsRoll(int x, int z) {
+        long h = ((long) x * 0xD6E8FEB86659FD93L) ^ ((long) z * 0x9E3779B97F4A7C15L);
+        return Math.floorMod(h >>> 37, 1000) < 5;
+    }
+
+    private static boolean wallWindowRoll(int x, int z) {
+        long h = ((long) x * 0x8DA6B343D192ED03L) ^ ((long) z * 0xD1B54A32D192ED03L);
+        return Math.floorMod(h >>> 41, 1000) < 60;
     }
 
     private static BlockState withVariant(BlockState state, int variant) {

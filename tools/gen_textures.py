@@ -266,6 +266,45 @@ def write_exits():
     save(d, os.path.join(BLOCK, "deep_exit.png"))
 
 
+def write_levels34():
+    """Level 3 (Electrical Station) and Level 4 (Abandoned Office) palette."""
+    # metal_bars: rusty vertical bars (the indestructible gates of Level 3)
+    mb = np.tile(np.array([28, 28, 32], float), (S, S, 1))
+    for x in (1, 4, 7, 10, 13):
+        mb[:, x] = [122, 116, 108]
+        mb[:, x + 1] = [86, 82, 78]
+    save(mb, os.path.join(BLOCK, "metal_bars.png"))
+    # office_wall: pale painted drywall with faint panel seams
+    ow = np.tile(np.array([214, 214, 210], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 8
+    ow[::8, :] *= 0.93
+    save(ow, os.path.join(BLOCK, "office_wall.png"))
+    # office_carpet: cool grey-blue office carpet
+    oc = np.tile(np.array([92, 100, 118], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 16
+    save(oc, os.path.join(BLOCK, "office_carpet.png"))
+    # office_window: blacked-out window with a frame and mullion
+    win = np.tile(np.array([14, 16, 22], float), (S, S, 1))
+    win[0, :] = win[15, :] = [74, 76, 82]
+    win[:, 0] = win[:, 15] = [74, 76, 82]
+    win[:, 7:9] = [74, 76, 82]
+    save(win, os.path.join(BLOCK, "office_window.png"))
+    # water_cooler: white body with a blue bottle
+    wc = np.tile(np.array([212, 214, 216], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 8
+    wc[2:6, 5:11] = [120, 170, 212]
+    wc[10:14, 5:11] = [186, 188, 190]
+    save(wc, os.path.join(BLOCK, "water_cooler.png"))
+    # exit_door: a plain metal door with a handle (Level 2 -> 3)
+    ed = np.tile(np.array([150, 150, 156], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 10
+    ed[0, :] = ed[15, :] = [108, 108, 114]
+    ed[:, 0] = ed[:, 15] = [108, 108, 114]
+    ed[7:9, 11:14] = [206, 200, 120]
+    save(ed, os.path.join(BLOCK, "exit_door.png"))
+    # elevator: brushed doors with a centre seam and call button (Level 3 -> 4)
+    el = np.tile(np.array([168, 168, 174], float), (S, S, 1)) + (noise() - 0.5)[:, :, None] * 8
+    el[:, 7:9] = [104, 104, 110]
+    el[6:10, 1:3] = [206, 184, 84]
+    save(el, os.path.join(BLOCK, "elevator.png"))
+
+
 def main():
     write_props()
     write_listener()
@@ -279,6 +318,7 @@ def main():
     write_level_blocks()
     write_monsters()
     write_exits()
+    write_levels34()
     count = 0
     for root, _, files in os.walk(OUT):
         count += sum(1 for f in files if f.endswith(".png"))

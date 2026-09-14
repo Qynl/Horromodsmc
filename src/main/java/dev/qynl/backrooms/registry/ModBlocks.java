@@ -95,6 +95,39 @@ public final class ModBlocks {
                     .strength(-1.0f, 3600000.0f)
                     .sounds(SoundGroup.STONE), 2));
 
+    // Level 3 - Electrical Station: rusty bars that block the halls, wired brick.
+    public static final Block METAL_BARS = register("metal_bars", new Block(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.IRON_GRAY)
+                    .noCollision()
+                    .nonOpaque()
+                    .strength(2.0f, 6.0f)
+                    .sounds(SoundGroup.METAL)));
+
+    // Level 4 - Abandoned Office: pale drywall, cool carpet, blacked-out windows, water coolers.
+    public static final Block OFFICE_WALL = register("office_wall", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.WHITE_GRAY).strength(1.2f, 3.0f).sounds(SoundGroup.STONE)));
+    public static final Block OFFICE_CARPET = register("office_carpet", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.BLUE).strength(0.4f).sounds(SoundGroup.WOOL)));
+    public static final Block OFFICE_WINDOW = register("office_window", new Block(
+            AbstractBlock.Settings.create().mapColor(MapColor.BLACK).strength(0.8f, 3.0f).sounds(SoundGroup.GLASS)));
+    public static final Block WATER_COOLER = register("water_cooler", prop(0.6f));
+
+    // Ways down, per the wiki: an unlocked door on Level 2 -> 3, an elevator on Level 3 -> 4.
+    public static final Block EXIT_DOOR = register("exit_door", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.IRON_GRAY)
+                    .noCollision()
+                    .strength(-1.0f, 3600000.0f)
+                    .sounds(SoundGroup.METAL), 3));
+
+    public static final Block ELEVATOR = register("elevator", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.IRON_GRAY)
+                    .noCollision()
+                    .strength(-1.0f, 3600000.0f)
+                    .sounds(SoundGroup.METAL), 4));
+
     private static Block prop(float strength) {
         return new Block(AbstractBlock.Settings.create()
                 .mapColor(MapColor.GRAY)

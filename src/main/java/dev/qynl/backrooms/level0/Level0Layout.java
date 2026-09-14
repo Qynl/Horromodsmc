@@ -273,7 +273,7 @@ public final class Level0Layout {
         long h = mix(seed, drift ^ PROP_SALT, x, z);
         int roll = (int) Math.floorMod(h >>> 17, 1000);
         // Crates and drums are the "resources" of the deeper levels, so clutter is denser there.
-        int base = level == 1 ? 42 : level == 2 ? 34 : 26;
+        int base = level == 1 ? 42 : level == 2 ? 34 : level == 3 ? 30 : level == 4 ? 20 : 26;
         int density = style(x, z) == Style.DARK ? base / 2 : base;
         if (roll >= density) return PROP_NONE;
         return 1 + (int) Math.floorMod(h >>> 29, PROP_COUNT);
@@ -283,7 +283,7 @@ public final class Level0Layout {
 
     /** Level 1 only: a shallow puddle of stagnant liquid on open floor. Sparse and deniable. */
     public boolean puddleAt(int x, int z) {
-        if (level != 1) return false;
+        if (level != 1 && level != 3) return false;
         int bits = tileBits(x, z);
         if ((bits & BIT_SOLID) != 0 || (bits & BIT_PILLAR) != 0) return false;
         long h = mix(seed, drift ^ PUDDLE_SALT, x, z);
@@ -355,6 +355,19 @@ public final class Level0Layout {
                 case HALL, HUB -> 2 + 2;   // 4
                 default -> 3;              // interior of 2: pipes overhead
             };
+        } else if (level == 3) {
+            // Cramped service halls, but the occasional vast machine room towers overhead.
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 4 + rng.nextInt(2);   // 6-7
+                case LONG -> 3;                              // crawl-height corridors
+                default -> 3;
+            };
+        } else if (level == 4) {
+            // Office floors: a comfortable, consistent ceiling.
+            ceilingY = switch (style) {
+                case HALL, HUB -> 2 + 3;                     // 5
+                default -> 2 + 2;                            // 4
+            };
         } else {
             ceilingY = switch (style) {
                 case HALL, HUB -> 2 + 4 + rng.nextInt(2);   // 6-7: high, echoing
@@ -400,6 +413,18 @@ public final class Level0Layout {
                 case LONG -> 4;
                 default -> 5 + rng.nextInt(3);   // uneven industrial strips
             };
+        } else if (level == 3) {
+            spacing = switch (style) {
+                case HALL, HUB -> 6;
+                case LONG -> 4;
+                default -> 5 + rng.nextInt(3);   // dim, unreliable strips
+            };
+        } else if (level == 4) {
+            spacing = switch (style) {
+                case HALL, HUB -> 5;
+                case LONG -> 4;
+                default -> 4;                    // bright, even office lighting
+            };
         } else {
             spacing = switch (style) {
                 case HALL, HUB -> 6;
@@ -439,6 +464,26 @@ public final class Level0Layout {
             wLong = 0.32 + 0.06 * deep;
             wHub = 0.01;
             wImpossible = 0.06 + 0.08 * deep;
+            wPoolroom = 0.02;
+        } else if (level == 3) {
+            // Electrical Station: cramped brick hallways, dark machinery runs, the odd vast room.
+            wGrid = 0.20 - 0.06 * deep;
+            wOrganic = 0.08;
+            wHall = 0.10;
+            wDark = 0.22 + 0.20 * deep;
+            wLong = 0.30 + 0.06 * deep;
+            wHub = 0.02;
+            wImpossible = 0.06 + 0.06 * deep;
+            wPoolroom = 0.0;
+        } else if (level == 4) {
+            // Abandoned Office: an organised, well-lit grid of rooms and pillar halls. Calm.
+            wGrid = 0.40 - 0.10 * deep;
+            wOrganic = 0.22;
+            wHall = 0.14;
+            wDark = 0.02;
+            wLong = 0.10;
+            wHub = 0.08;
+            wImpossible = 0.02;
             wPoolroom = 0.02;
         } else {
             wGrid = 0.32 - 0.14 * deep;

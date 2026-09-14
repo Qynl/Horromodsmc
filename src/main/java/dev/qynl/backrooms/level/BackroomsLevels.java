@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The level registry. Levels 0, 1 and 2 ship today; the mod is organised so that a further level is:
+ * The level registry. Levels 0-4 ship today; the mod is organised so that a further level is:
  *
  * <ol>
  *   <li>a new {@link LevelTheme} registered here,</li>
@@ -26,12 +26,20 @@ public final class BackroomsLevels {
     /** Level 2 - "Abandoned Utility Halls": narrow brick-and-steel service tunnels. */
     public static final LevelTheme LEVEL_2 = new LevelTheme(2, "Level 2", "level2", "level2", 1443094, 789516);
 
+    /** Level 3 - "Electrical Station": cramped brick halls, wiring and machinery. */
+    public static final LevelTheme LEVEL_3 = new LevelTheme(3, "Level 3", "level3", "level3", 2366742, 1052680);
+
+    /** Level 4 - "Abandoned Office": an empty, well-lit office building. */
+    public static final LevelTheme LEVEL_4 = new LevelTheme(4, "Level 4", "level4", "level4", 13159632, 11581632);
+
     private static final Map<Integer, LevelTheme> LEVELS = new HashMap<>();
 
     static {
         register(LEVEL_0);
         register(LEVEL_1);
         register(LEVEL_2);
+        register(LEVEL_3);
+        register(LEVEL_4);
     }
 
     public static void register(LevelTheme theme) {

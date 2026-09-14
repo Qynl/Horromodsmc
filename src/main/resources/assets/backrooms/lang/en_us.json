@@ -40,5 +40,14 @@
   "subtitles.backrooms.hound_growl": "Low growl",
   "subtitles.backrooms.hound_bark": "Barking",
   "block.backrooms.flicker_wall": "Flickering Wall",
-  "block.backrooms.deep_exit": "Endless Corridor"
+  "block.backrooms.deep_exit": "Endless Corridor",
+  "block.backrooms.metal_bars": "Metal Bars",
+  "block.backrooms.office_wall": "Office Wall",
+  "block.backrooms.office_carpet": "Office Carpet",
+  "block.backrooms.office_window": "Blacked-Out Window",
+  "block.backrooms.water_cooler": "Water Cooler",
+  "block.backrooms.exit_door": "Unlocked Door",
+  "block.backrooms.elevator": "Elevator",
+  "backrooms.level3": "Level 3 - Electrical Station",
+  "backrooms.level4": "Level 4 - Abandoned Office"
 }

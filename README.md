@@ -1,4 +1,4 @@
-# The Backrooms — Levels 0, 1 & 2
+# The Backrooms — Levels 0-4
 
 A Fabric mod for **Minecraft 1.21.1** that adds a rare tear in the Overworld leading into an
 effectively endless, buzzing, yellow **Level 0** — and, deeper still, the damp concrete warehouse
@@ -55,20 +55,35 @@ sparse, uneven fluorescents that leave long dark patches. Heavy **piping** lines
 **machinery**, oil drums and crates clutter the passages. Source:
 backrooms-wiki.wikidot.com/level-2.
 
+### Level 3 — "Electrical Station"
+A dangerous old **electrical facility**: cramped, inconsistent **brick hallways** (some so narrow you
+crawl), dusty concrete floors, dim fluorescents, and walls covered in **wiring, cables, electrical
+boxes and machinery**, with pipes of black liquid. Rusty **metal bars** block many passages. Hot,
+stuffy, and home to hyper-intelligent hostile entities. Source: backrooms-wiki.wikidot.com/level-3.
+
+### Level 4 — "Abandoned Office"
+An empty, **well-lit office building**, almost completely devoid of furniture. Pale drywall, cool
+carpet, **blacked-out windows**, and the occasional **water cooler** and vending machine. Per the
+wiki it is **mostly devoid of entities** — a rare, calm place to catch your breath. Source:
+backrooms-wiki.wikidot.com/level-4.
+
 ### Getting deeper (the wiki's way in)
 - **Overworld → Level 0**: the rare **tear** in normal terrain — walk in.
 - **Level 0 → Level 1**: per the wiki, *"survive long enough to find a **flickering wall** to throw
   yourself through."* Rare sections of wall stutter and are not quite solid; step into one.
 - **Level 1 → Level 2**: per the wiki, Level 2 is reached by *"traversing down any corridors that
   appear to go on for longer than most."* Follow an endless hallway far enough and it fades down.
+- **Level 2 → Level 3**: per the wiki, *"unlocked doors on Level 2 commonly lead to Level 3."* Find
+  one of the rare unlocked doors in the tunnels.
+- **Level 3 → Level 4**: per the wiki, you leave Level 3 *"using the elevator."* Find the elevator.
 
 ### Monsters (sourced from the wiki)
 Each level's entities come from its wiki page:
 
 - **The Listener** (all levels) — blind; hunts by sound. **Sneaking is silent**, sprinting is a drum.
-- **Smiler** (Levels 1 & 2) — a grinning face that hangs in the dark and is **drawn to light and
+- **Smiler** (Levels 1-3) — a grinning face that hangs in the dark and is **drawn to light and
   noise**. Bring a torch near it and it charges, screeching; contact hurts and it recoils.
-- **Hound** (Levels 1 & 2) — a humanoid dog that trots until it spots you, then runs you down. Per
+- **Hound** (Levels 1-3) — a humanoid dog that trots until it spots you, then runs you down. Per
   the wiki's advice, **meet its eyes up close while making noise and it hesitates**, giving you a
   moment to back away.
 

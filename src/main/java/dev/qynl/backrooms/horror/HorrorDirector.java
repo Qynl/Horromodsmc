@@ -112,11 +112,11 @@ public final class HorrorDirector {
             lightOffBehind(world, player);
         } else if (cfg.glimpses && roll(0.0007 + 0.002 * paranoia)) {
             spawnGlimpse(world, player);
-        } else if (cfg.listenerEnabled && levelId >= 1 && roll(0.0006 + 0.0014 * paranoia)) {
+        } else if (cfg.listenerEnabled && levelId >= 1 && levelId <= 3 && roll(0.0006 + 0.0014 * paranoia)) {
             spawnSmiler(world, player, levelId);
-        } else if (cfg.listenerEnabled && levelId >= 1 && roll(0.0004 + 0.0010 * paranoia)) {
+        } else if (cfg.listenerEnabled && levelId >= 1 && levelId <= 3 && roll(0.0004 + 0.0010 * paranoia)) {
             spawnHound(world, player, levelId);
-        } else if (cfg.listenerEnabled && roll(0.0005 + 0.0012 * paranoia)) {
+        } else if (cfg.listenerEnabled && levelId <= 3 && roll(0.0005 + 0.0012 * paranoia)) {
             spawnListener(world, player, levelId);
         } else {
             return;
