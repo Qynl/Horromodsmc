@@ -1,7 +1,6 @@
 package dev.qynl.backrooms.audio;
 
 import net.minecraft.client.sound.AbstractSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.random.Random;
@@ -23,7 +22,7 @@ public class BuzzSoundInstance extends AbstractSoundInstance {
     }
 
     @Override
-    public SoundInstance.RepeatType getRepeatType() {
-        return SoundInstance.RepeatType.ALWAYS;
+    public boolean isRepeatable() {
+        return true;
     }
 }
