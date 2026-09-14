@@ -154,6 +154,12 @@ public final class ModBlocks {
                     .mapColor(MapColor.STONE_GRAY).noCollision()
                     .strength(-1.0f, 3600000.0f).sounds(BlockSoundGroup.STONE), 8));
 
+    // The way home: a rare hatch on Level 8 that lifts you out of the Backrooms entirely (target -1).
+    public static final Block ESCAPE_HATCH = register("escape_hatch", new LevelExitBlock(
+            AbstractBlock.Settings.create()
+                    .mapColor(MapColor.EMERALD_GREEN).noCollision().luminance(state -> 8)
+                    .strength(-1.0f, 3600000.0f).sounds(BlockSoundGroup.METAL), -1));
+
     private static Block prop(float strength) {
         return new Block(AbstractBlock.Settings.create()
                 .mapColor(MapColor.GRAY)

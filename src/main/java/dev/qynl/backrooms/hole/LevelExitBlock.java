@@ -26,7 +26,11 @@ public class LevelExitBlock extends Block {
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
         if (!world.isClient() && entity instanceof ServerPlayerEntity player) {
-            HoleEntry.goToLevel(player, target);
+            if (target < 0) {
+                HoleEntry.escapeToOverworld(player);
+            } else {
+                HoleEntry.goToLevel(player, target);
+            }
         }
     }
 }

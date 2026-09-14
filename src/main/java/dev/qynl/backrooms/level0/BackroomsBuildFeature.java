@@ -284,6 +284,7 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         if (levelId == 5 && boilerDoorRoll(x, z)) return ModBlocks.BOILER_DOOR;
         if (levelId == 6 && stairDownRoll(x, z)) return ModBlocks.STAIR_DOWN;
         if (levelId == 7 && caveMouthRoll(x, z)) return ModBlocks.CAVE_MOUTH;
+        if (levelId == 8 && escapeRoll(x, z)) return ModBlocks.ESCAPE_HATCH;
         return null;
     }
 
@@ -291,6 +292,12 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     private static boolean stairDownRoll(int x, int z) {
         long h = ((long) x * 0x9E3779B97F4A7C15L) ^ ((long) z * 0x7EA5E7L);
         return Math.floorMod(h >>> 21, 1000) < 4;
+    }
+
+    /** Level 8 -> Overworld: the way home is deliberately hard to find. */
+    private static boolean escapeRoll(int x, int z) {
+        long h = ((long) x * 0x9E3779B97F4A7C15L) ^ ((long) z * 0xDEADBEEFL);
+        return Math.floorMod(h >>> 29, 1000) < 2;
     }
 
     /** Level 7 -> 8: the underwater cave mouth (wiki: cave in an underwater mountain). */

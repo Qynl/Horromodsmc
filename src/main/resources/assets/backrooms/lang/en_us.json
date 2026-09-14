@@ -62,5 +62,6 @@
   "block.backrooms.stair_down": "Staircase Down",
   "block.backrooms.cave_mouth": "Cave Mouth",
   "backrooms.level7": "Level 7 - Lights Out",
-  "backrooms.level8": "Level 8 - Lights Out"
+  "backrooms.level8": "Level 8 - Lights Out",
+  "block.backrooms.escape_hatch": "Escape Hatch"
 }

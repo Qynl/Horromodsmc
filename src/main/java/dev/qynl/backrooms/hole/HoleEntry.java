@@ -51,6 +51,27 @@ public final class HoleEntry {
         player.playSound(ModSoundEvents.THUMP, 0.12f, 0.7f);
     }
 
+    /**
+     * The rare way home. A hatch on Level 8 lifts the player out of the Backrooms entirely and
+     * sets them down on the Overworld spawn - the only true exit from the whole descent.
+     */
+    public static void escapeToOverworld(ServerPlayerEntity player) {
+        ServerWorld over = player.getServer().getWorld(World.OVERWORLD);
+        if (over == null) {
+            return;
+        }
+        BlockPos spawn = over.getSpawnPos();
+        int x = spawn.getX(), z = spawn.getZ();
+        int y = over.getTopY();
+        BlockPos.Mutable mut = new BlockPos.Mutable(x, y, z);
+        while (y > over.getBottomY() && over.getBlockState(mut.set(x, y, z)).isAir()) {
+            y--;
+        }
+        player.teleport(over, x + 0.5, y + 1, z + 0.5,
+                EnumSet.noneOf(PositionFlag.class), player.getYaw(), player.getPitch());
+        player.playSound(ModSoundEvents.THUMP, 0.16f, 1.0f);
+    }
+
     private HoleEntry() {
     }
 }
