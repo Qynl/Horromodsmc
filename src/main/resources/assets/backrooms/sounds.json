@@ -121,5 +121,37 @@
       }
     ],
     "subtitle": "subtitles.backrooms.listener_step"
+  },
+  "smiler_idle": {
+    "sounds": [
+      {
+        "name": "backrooms:smiler_idle"
+      }
+    ],
+    "subtitle": "subtitles.backrooms.smiler_idle"
+  },
+  "smiler_chase": {
+    "sounds": [
+      {
+        "name": "backrooms:smiler_chase"
+      }
+    ],
+    "subtitle": "subtitles.backrooms.smiler_chase"
+  },
+  "hound_growl": {
+    "sounds": [
+      {
+        "name": "backrooms:hound_growl"
+      }
+    ],
+    "subtitle": "subtitles.backrooms.hound_growl"
+  },
+  "hound_bark": {
+    "sounds": [
+      {
+        "name": "backrooms:hound_bark"
+      }
+    ],
+    "subtitle": "subtitles.backrooms.hound_bark"
   }
 }

@@ -166,6 +166,45 @@ def tear_ambient():
     emit("tear_ambient", norm(s, 0.2))
 
 
+
+def smiler_idle():
+    d = 1.6
+    x = t(d)
+    rng = np.random.default_rng(21)
+    f = 300 + 120 * np.sin(2 * np.pi * 3 * x)          # warbling, almost giggling
+    phase = 2 * np.pi * np.cumsum(f) / SR
+    s = np.tanh(np.sin(phase) * 2) * (0.6 + 0.4 * np.sin(2 * np.pi * 7 * x))
+    s += 0.15 * lowpass(rng.standard_normal(x.size), 0.05)
+    env = np.sin(np.pi * x / d) ** 1.5
+    emit("smiler_idle", norm(s * env, 0.5))
+
+def smiler_chase():
+    d = 0.8
+    x = t(d)
+    f = np.linspace(700, 2200, x.size)                 # rising screech
+    phase = 2 * np.pi * np.cumsum(f) / SR
+    s = np.tanh(np.sin(phase) * 4) * np.exp(-x * 1.5) + 0.3 * np.random.default_rng(22).standard_normal(x.size) * np.exp(-x * 3)
+    emit("smiler_chase", norm(s, 0.85))
+
+def hound_growl():
+    d = 1.1
+    x = t(d)
+    rng = np.random.default_rng(23)
+    f = 70 + 25 * np.sin(2 * np.pi * 18 * x)           # low, rattling growl
+    phase = 2 * np.pi * np.cumsum(f) / SR
+    s = np.tanh(np.sin(phase) * 3) * (0.7 + 0.3 * np.sin(2 * np.pi * 30 * x))
+    s += 0.2 * lowpass(rng.standard_normal(x.size), 0.04)
+    env = np.sin(np.pi * x / d) ** 1.2
+    emit("hound_growl", norm(s * env, 0.7))
+
+def hound_bark():
+    d = 0.3
+    x = t(d)
+    f = np.linspace(500, 150, x.size)
+    phase = 2 * np.pi * np.cumsum(f) / SR
+    s = np.tanh(np.sin(phase) * 4) * np.exp(-x * 10) + 0.4 * np.random.default_rng(24).standard_normal(x.size) * np.exp(-x * 20)
+    emit("hound_bark", norm(s, 0.8))
+
 def main():
     os.makedirs(OUT, exist_ok=True)
     buzz(); hum(); drip()
@@ -174,6 +213,7 @@ def main():
     step("phantom_footstep", 0.18, 8, 0.5)
     distant_noise(); wall_sound(); flicker(); thump(); tear_ambient()
     listener_idle(); listener_chase(); listener_step()
+    smiler_idle(); smiler_chase(); hound_growl(); hound_bark()
     names = sorted(f for f in os.listdir(OUT) if f.endswith(".ogg"))
     print("wrote", len(names), "ogg files:")
     for n in names:

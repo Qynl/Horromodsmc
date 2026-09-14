@@ -225,6 +225,27 @@ def write_level_blocks():
     save(pu, os.path.join(BLOCK, "puddle.png"))
 
 
+def write_monsters():
+    """Smiler (glowing grin in the dark) and Hound (dark quadruped) entity textures."""
+    # smiler: black void with two eyes and a wide crescent grin
+    img = np.zeros((S, S, 3))
+    img[4, 4] = img[4, 5] = img[4, 10] = img[4, 11] = [235, 235, 210]   # eyes
+    for x in range(3, 13):                                                # grin crescent
+        y = 9 + int(round(1.6 * np.sin(np.pi * (x - 3) / 9.0)))
+        img[y, x] = [235, 235, 210]
+        img[y + 1, x] = [200, 200, 180]
+    save(img, os.path.join(ENTITY, "smiler.png"))
+    # hound: low dark canine silhouette (billboarded)
+    img = np.zeros((S, S, 3))
+    body = [26, 24, 26]
+    img[7:11, 3:13] = body                       # torso
+    img[5:8, 10:14] = body                       # head
+    img[4, 11] = img[4, 13] = [180, 40, 40]      # eyes
+    img[11:14, 4:6] = body; img[11:14, 10:12] = body   # legs
+    img[6:9, 1:3] = body                         # tail
+    save(img, os.path.join(ENTITY, "hound.png"))
+
+
 def main():
     write_props()
     write_listener()
@@ -236,6 +257,7 @@ def main():
     write_void()
     write_glimpse()
     write_level_blocks()
+    write_monsters()
     count = 0
     for root, _, files in os.walk(OUT):
         count += sum(1 for f in files if f.endswith(".png"))

@@ -112,6 +112,10 @@ public final class HorrorDirector {
             lightOffBehind(world, player);
         } else if (cfg.glimpses && roll(0.0007 + 0.002 * paranoia)) {
             spawnGlimpse(world, player);
+        } else if (cfg.listenerEnabled && levelId >= 1 && roll(0.0006 + 0.0014 * paranoia)) {
+            spawnSmiler(world, player, levelId);
+        } else if (cfg.listenerEnabled && levelId >= 1 && roll(0.0004 + 0.0010 * paranoia)) {
+            spawnHound(world, player, levelId);
         } else if (cfg.listenerEnabled && roll(0.0005 + 0.0012 * paranoia)) {
             spawnListener(world, player, levelId);
         } else {
@@ -133,6 +137,36 @@ public final class HorrorDirector {
         BlockPos spawn = BackroomsSpawn.find(layout, tx, tz);
         ListenerEntity listener = new ListenerEntity(world, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5);
         world.spawnEntity(listener);
+    }
+
+    /** The Smiler haunts the dark of Levels 1 and 2; at most two at a time. */
+    private static void spawnSmiler(ServerWorld world, ServerPlayerEntity player, int levelId) {
+        if (world.getEntitiesByType(ModEntityTypes.SMILER, e -> true).size() >= 2) {
+            return;
+        }
+        Level0Layout layout = Level0Holder.get(world.getSeed(), levelId);
+        double ang = random.nextDouble() * Math.PI * 2;
+        double dist = 14 + random.nextDouble() * 8;
+        int tx = player.getBlockPos().getX() + (int) (Math.cos(ang) * dist);
+        int tz = player.getBlockPos().getZ() + (int) (Math.sin(ang) * dist);
+        BlockPos spawn = BackroomsSpawn.find(layout, tx, tz);
+        SmilerEntity smiler = new SmilerEntity(world, spawn.getX() + 0.5, spawn.getY() + 1.2, spawn.getZ() + 0.5);
+        world.spawnEntity(smiler);
+    }
+
+    /** The Hound runs the halls of Levels 1 and 2; at most two at a time. */
+    private static void spawnHound(ServerWorld world, ServerPlayerEntity player, int levelId) {
+        if (world.getEntitiesByType(ModEntityTypes.HOUND, e -> true).size() >= 2) {
+            return;
+        }
+        Level0Layout layout = Level0Holder.get(world.getSeed(), levelId);
+        double ang = random.nextDouble() * Math.PI * 2;
+        double dist = 18 + random.nextDouble() * 8;
+        int tx = player.getBlockPos().getX() + (int) (Math.cos(ang) * dist);
+        int tz = player.getBlockPos().getZ() + (int) (Math.sin(ang) * dist);
+        BlockPos spawn = BackroomsSpawn.find(layout, tx, tz);
+        HoundEntity hound = new HoundEntity(world, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5);
+        world.spawnEntity(hound);
     }
 
     private static boolean roll(double chance) {

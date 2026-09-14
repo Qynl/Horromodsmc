@@ -55,9 +55,18 @@ angles, lit by sparse, uneven fluorescents that leave long dark patches. Heavy *
 walls; **machinery**, oil drums and crates clutter the passages. Source:
 backrooms-wiki.wikidot.com/level-2.
 
-### The Listener hunts every level
-The Listener is not confined to Level 0 — it stalks Levels 1 and 2 as well, so the deeper you go the
-less alone you are. Each level runs the same psychological layer (phantom footsteps, dying lights,
+### Monsters (sourced from the wiki)
+Each level's entities come from its wiki page:
+
+- **The Listener** (all levels) — blind; hunts by sound. **Sneaking is silent**, sprinting is a drum.
+- **Smiler** (Levels 1 & 2) — a grinning face that hangs in the dark and is **drawn to light and
+  noise**. Bring a torch near it and it charges, screeching; contact hurts and it recoils.
+- **Hound** (Levels 1 & 2) — a humanoid dog that trots until it spots you, then runs you down. Per
+  the wiki's advice, **meet its eyes up close while making noise and it hesitates**, giving you a
+  moment to back away.
+
+They are never always present, never a guaranteed kill, and gated behind the `listenerEnabled`
+config flag. Each level also runs the same psychological layer (phantom footsteps, dying lights,
 glimpses, reality drift) on its own layout.
 
 ### Adding further levels

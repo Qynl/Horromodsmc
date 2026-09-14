@@ -32,5 +32,11 @@
   "block.backrooms.machinery": "Machinery",
   "backrooms.level0": "Level 0 - The Hole",
   "backrooms.level1": "Level 1 - Habitable Zone",
-  "backrooms.level2": "Level 2 - Abandoned Utility Halls"
+  "backrooms.level2": "Level 2 - Abandoned Utility Halls",
+  "entity.backrooms.smiler": "Smiler",
+  "entity.backrooms.hound": "Hound",
+  "subtitles.backrooms.smiler_idle": "Unsettling giggling",
+  "subtitles.backrooms.smiler_chase": "Screech",
+  "subtitles.backrooms.hound_growl": "Low growl",
+  "subtitles.backrooms.hound_bark": "Barking"
 }
