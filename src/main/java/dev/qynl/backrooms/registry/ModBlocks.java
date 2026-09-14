@@ -8,7 +8,7 @@ import dev.qynl.backrooms.light.FluorescentLightBlock;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.SoundGroup;
+import net.minecraft.sound.SoundGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;

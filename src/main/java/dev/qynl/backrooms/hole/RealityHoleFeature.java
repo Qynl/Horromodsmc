@@ -3,7 +3,7 @@ package dev.qynl.backrooms.hole;
 import dev.qynl.backrooms.config.BackroomsConfig;
 import dev.qynl.backrooms.registry.ModBlocks;
 import net.minecraft.block.Blocks;
-import net.minecraft.structure.StructureWorldAccess;
+import net.minecraft.world.StructureWorldAccess;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;

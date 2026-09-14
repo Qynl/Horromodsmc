@@ -6,7 +6,7 @@ import dev.qynl.backrooms.level0.BackroomsSpawn;
 import dev.qynl.backrooms.level0.Level0Holder;
 import dev.qynl.backrooms.level0.Level0Layout;
 import dev.qynl.backrooms.registry.ModSoundEvents;
-import net.minecraft.entity.PositionFlag;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
