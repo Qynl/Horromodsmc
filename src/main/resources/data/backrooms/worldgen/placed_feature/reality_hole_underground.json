@@ -1,0 +1,14 @@
+{
+  "feature": "backrooms:reality_hole",
+  "placement": [
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": { "absolute": -40 },
+        "max_inclusive": { "absolute": 40 }
+      }
+    },
+    { "type": "minecraft:in_square" }
+  ]
+}

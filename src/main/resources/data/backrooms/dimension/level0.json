@@ -1,0 +1,15 @@
+{
+  "type": "backrooms:level0",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "backrooms:level0",
+      "features": true,
+      "lakes": false,
+      "layers": [
+        { "block": "minecraft:bedrock", "height": 16 }
+      ],
+      "structure_overrides": []
+    }
+  }
+}

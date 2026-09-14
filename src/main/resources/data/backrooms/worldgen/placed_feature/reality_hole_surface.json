@@ -1,0 +1,7 @@
+{
+  "feature": "backrooms:reality_hole",
+  "placement": [
+    { "type": "minecraft:heightmap", "heightmap": "WORLD_SURFACE" },
+    { "type": "minecraft:in_square" }
+  ]
+}

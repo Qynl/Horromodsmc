@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "variant=0": { "model": "backrooms:block/carpet_0" },
+    "variant=1": { "model": "backrooms:block/carpet_1" },
+    "variant=2": { "model": "backrooms:block/carpet_2" },
+    "variant=3": { "model": "backrooms:block/carpet_3" }
+  }
+}

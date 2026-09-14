@@ -1,0 +1,15 @@
+# Gradle / IDE
+.gradle/
+build/
+out/
+run/
+classes/
+*.ipr
+*.iws
+.idea/
+.vscode/
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]

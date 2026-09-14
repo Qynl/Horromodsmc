@@ -1,0 +1,26 @@
+package dev.qynl.backrooms.registry;
+
+import dev.qynl.backrooms.BackroomsMod;
+import dev.qynl.backrooms.hole.RealityHoleFeature;
+import dev.qynl.backrooms.level0.BackroomsBuildFeature;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.gen.feature.DefaultFeatureConfig;
+import net.minecraft.world.gen.feature.Feature;
+
+public final class ModFeatures {
+
+    public static final Feature<DefaultFeatureConfig> LEVEL0_BUILD =
+            register("level0_build", new BackroomsBuildFeature());
+
+    public static final Feature<DefaultFeatureConfig> REALITY_HOLE =
+            register("reality_hole", new RealityHoleFeature());
+
+    private static Feature<DefaultFeatureConfig> register(String name, Feature<DefaultFeatureConfig> feature) {
+        return Registry.register(Registries.FEATURE, Identifier.of(BackroomsMod.MOD_ID, name), feature);
+    }
+
+    private ModFeatures() {
+    }
+}

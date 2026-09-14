@@ -1,0 +1,14 @@
+{
+  "buzz": { "sounds": [ { "name": "backrooms:buzz", "volume": 1.0 } ], "subtitle": "subtitles.backrooms.buzz" },
+  "hum": { "sounds": [ { "name": "backrooms:hum", "volume": 1.0 } ], "subtitle": "subtitles.backrooms.hum" },
+  "drip": { "sounds": [ { "name": "backrooms:drip" } ], "subtitle": "subtitles.backrooms.drip" },
+  "carpet_step": { "sounds": [ { "name": "backrooms:carpet_step" }, { "name": "backrooms:carpet_step2" } ] },
+  "carpet_place": { "sounds": [ { "name": "backrooms:carpet_step" } ] },
+  "carpet_break": { "sounds": [ { "name": "backrooms:carpet_step" }, { "name": "backrooms:carpet_step2" } ] },
+  "distant_noise": { "sounds": [ { "name": "backrooms:distant_noise" } ], "subtitle": "subtitles.backrooms.distant_noise" },
+  "wall_sound": { "sounds": [ { "name": "backrooms:wall_sound" } ] },
+  "phantom_footstep": { "sounds": [ { "name": "backrooms:phantom_footstep" } ], "subtitle": "subtitles.backrooms.phantom_footstep" },
+  "flicker": { "sounds": [ { "name": "backrooms:flicker" } ], "subtitle": "subtitles.backrooms.flicker" },
+  "thump": { "sounds": [ { "name": "backrooms:thump" } ], "subtitle": "subtitles.backrooms.thump" },
+  "tear_ambient": { "sounds": [ { "name": "backrooms:tear_ambient" } ] }
+}
