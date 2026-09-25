@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "hollow",
+  "version": "${version}",
+  "name": "Hollow",
+  "description": "Something stalks the dark. Watchers in the night, whispers in the walls, and a Dread that grows the longer you stay out. Keep a totem close, light the Hallowed Lanterns, and never stare too long.",
+  "authors": [
+    "HorromodsMC"
+  ],
+  "contact": {
+    "sources": "https://github.com/Qynl/Horromodsmc"
+  },
+  "license": "MIT",
+  "icon": "assets/hollow/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.horromods.hollow.Hollow"
+    ],
+    "client": [
+      "com.horromods.hollow.client.HollowClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

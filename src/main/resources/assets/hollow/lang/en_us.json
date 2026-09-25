@@ -1,0 +1,18 @@
+{
+  "entity.hollow.watcher": "The Watcher",
+  "entity.hollow.apparition": "Apparition",
+
+  "item.hollow.shadow_fragment": "Shadow Fragment",
+  "item.hollow.shadow_fragment.tooltip": "A sliver of solidified dark. It is still cold.",
+  "item.hollow.warding_totem": "Warding Totem",
+  "item.hollow.warding_totem.tooltip": "Keep it on you. The Watcher cannot bear its gaze.",
+  "item.hollow.watcher_spawn_egg": "Watcher Spawn Egg",
+
+  "block.hollow.hallowed_lantern": "Hallowed Lantern",
+  "block.hollow.hallowed_lantern.tooltip": "Its blessed light calms Dread and keeps the dark at bay.",
+
+  "hollow.dread.begin": "You feel watched...",
+  "hollow.dread.rising": "Something moves in the dark.",
+  "hollow.dread.high": "It knows where you are.",
+  "hollow.dread.presence": "Do not look away."
+}

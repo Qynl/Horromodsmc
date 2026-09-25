@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "BFB",
+    "FSF",
+    "BFB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bone"
+    },
+    "F": {
+      "item": "hollow:shadow_fragment"
+    },
+    "S": {
+      "item": "minecraft:glowstone_dust"
+    }
+  },
+  "result": {
+    "id": "hollow:warding_totem",
+    "count": 1
+  }
+}
