@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
  * Renders the apparition with the Watcher's silhouette but a translucent,
  * smoke-grey texture so it reads as something that isn't really there.
  */
-public class ApparitionEntityRenderer extends MobEntityRenderer<ApparitionEntity, WatcherEntityModel> {
+public class ApparitionEntityRenderer extends MobEntityRenderer<ApparitionEntity, WatcherEntityModel<ApparitionEntity>> {
     public ApparitionEntityRenderer(EntityRendererFactory.Context context) {
-        super(context, new WatcherEntityModel(context.getPart(WatcherEntityModel.LAYER)), 0.0f);
+        super(context, new WatcherEntityModel<>(context.getPart(WatcherEntityModel.LAYER)), 0.0f);
     }
 
     @Override

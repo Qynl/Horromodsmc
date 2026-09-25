@@ -1,15 +1,16 @@
 package com.horromods.hollow.client;
 
-import com.google.common.collect.ImmutableList;
 import com.horromods.hollow.Hollow;
-import com.horromods.hollow.entity.WatcherEntity;
 import net.minecraft.client.model.ModelData;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.model.ModelPartBuilder;
 import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -18,7 +19,7 @@ import net.minecraft.util.math.MathHelper;
  * knees and a blank head with two pale eyes. Model space: ground is at
  * y=24, the top of the head reaches y=-18 (about 2.6 blocks tall).
  */
-public class WatcherEntityModel extends EntityModel<WatcherEntity> {
+public class WatcherEntityModel<T extends LivingEntity> extends EntityModel<T> {
     public static final EntityModelLayer LAYER =
             new EntityModelLayer(Identifier.of(Hollow.MOD_ID, "watcher"), "main");
 
@@ -59,11 +60,11 @@ public class WatcherEntityModel extends EntityModel<WatcherEntity> {
         root.addChild("right_leg",
                 ModelPartBuilder.create().uv(28, 16).cuboid(-1.0f, -20.0f, -1.0f, 2, 20, 2),
                 ModelTransform.pivot(-2.0f, 24.0f, 0.0f));
-        return new TexturedModelData(modelData, 64, 64);
+        return TexturedModelData.of(modelData, 64, 64);
     }
 
     @Override
-    public void setAngles(WatcherEntity entity, float limbAngle, float limbDistance,
+    public void setAngles(T entity, float limbAngle, float limbDistance,
             float animationProgress, float headYaw, float headPitch) {
         float swing = MathHelper.cos(limbAngle) * limbDistance * 0.9f;
         this.leftLeg.pitch = swing;
@@ -78,8 +79,12 @@ public class WatcherEntityModel extends EntityModel<WatcherEntity> {
     }
 
     @Override
-    public Iterable<ModelPart> getParts() {
-        return ImmutableList.of(this.head, this.torso, this.leftArm, this.rightArm,
-                this.leftLeg, this.rightLeg);
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, int color) {
+        this.head.render(matrices, vertices, light, overlay, color);
+        this.torso.render(matrices, vertices, light, overlay, color);
+        this.leftArm.render(matrices, vertices, light, overlay, color);
+        this.rightArm.render(matrices, vertices, light, overlay, color);
+        this.leftLeg.render(matrices, vertices, light, overlay, color);
+        this.rightLeg.render(matrices, vertices, light, overlay, color);
     }
 }

@@ -178,11 +178,14 @@ public class WatcherEntity extends HostileEntity {
 
         // Heartbeat and darkness aura for everyone nearby.
         if (this.age % 20 == 0) {
-            for (PlayerEntity player : world.getPlayers(this::canAffect)) {
+            for (PlayerEntity player : world.getPlayers()) {
+                if (!this.canAffect(player)) {
+                    continue;
+                }
                 double distance = Math.sqrt(player.squaredDistanceTo(this));
                 if (distance < 24.0) {
                     float volume = MathHelper.clamp((float) (1.3 - distance / 24.0), 0.15f, 1.3f);
-                    player.playSound(SoundEvents.ENTITY_WARDEN_HEARTBEAT, volume, 0.8f);
+                    player.playSound(SoundEvents.ENTITY_WARDEN_HEARTBEAT.value(), volume, 0.8f);
                 }
                 if (distance < 10.0) {
                     player.addStatusEffect(
@@ -242,7 +245,10 @@ public class WatcherEntity extends HostileEntity {
     private PlayerEntity findStaringPlayer() {
         PlayerEntity nearest = null;
         double best = 40.0 * 40.0;
-        for (PlayerEntity player : this.getWorld().getPlayers(p -> !p.isCreative() && !p.isSpectator())) {
+        for (PlayerEntity player : this.getWorld().getPlayers()) {
+            if (player.isCreative() || player.isSpectator()) {
+                continue;
+            }
             double distance = player.squaredDistanceTo(this);
             if (distance < best && this.isStaring(player)) {
                 best = distance;
@@ -286,7 +292,7 @@ public class WatcherEntity extends HostileEntity {
                 continue;
             }
 
-            this.teleport(x, y, z);
+            this.teleport(x, y, z, true);
             world.playSound(null, from.x, from.y, from.z,
                     SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.HOSTILE, 0.8f, 1.0f);
             world.playSound(null, x, y, z,
@@ -300,17 +306,17 @@ public class WatcherEntity extends HostileEntity {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.AMBIENT_CAVE;
+        return SoundEvents.AMBIENT_CAVE.value();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ENTITY_ENDERMAN_HURT;
+        return SoundEvents.ENTITY_ENDERMAN_HURT.value();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_ENDERMAN_DEATH;
+        return SoundEvents.ENTITY_ENDERMAN_DEATH.value();
     }
 
     @Override

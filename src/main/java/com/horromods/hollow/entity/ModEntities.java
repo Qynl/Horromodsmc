@@ -2,7 +2,6 @@ package com.horromods.hollow.entity;
 
 import com.horromods.hollow.Hollow;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.SpawnRestriction;
@@ -16,7 +15,7 @@ public final class ModEntities {
             Registries.ENTITY_TYPE,
             Identifier.of(Hollow.MOD_ID, "watcher"),
             EntityType.Builder.create(WatcherEntity::new, SpawnGroup.MONSTER)
-                    .dimensions(EntityDimensions.changing(0.8f, 2.7f))
+                    .dimensions(0.8f, 2.7f)
                     .maxTrackingRange(64)
                     .build());
 
@@ -24,7 +23,7 @@ public final class ModEntities {
             Registries.ENTITY_TYPE,
             Identifier.of(Hollow.MOD_ID, "apparition"),
             EntityType.Builder.create(ApparitionEntity::new, SpawnGroup.MISC)
-                    .dimensions(EntityDimensions.changing(0.8f, 2.7f))
+                    .dimensions(0.8f, 2.7f)
                     .maxTrackingRange(64)
                     .build());
 
@@ -35,7 +34,7 @@ public final class ModEntities {
         FabricDefaultAttributeRegistry.register(WATCHER, WatcherEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(APPARITION, ApparitionEntity.createAttributes());
 
-        SpawnRestriction.register(WATCHER, SpawnRestriction.Location.ON_GROUND,
+        SpawnRestriction.register(WATCHER, SpawnRestriction.SpawnLocation.ON_GROUND,
                 Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, WatcherEntity::canSpawn);
     }
 }

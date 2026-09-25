@@ -6,9 +6,9 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.util.Identifier;
 
-public class WatcherEntityRenderer extends MobEntityRenderer<WatcherEntity, WatcherEntityModel> {
+public class WatcherEntityRenderer extends MobEntityRenderer<WatcherEntity, WatcherEntityModel<WatcherEntity>> {
     public WatcherEntityRenderer(EntityRendererFactory.Context context) {
-        super(context, new WatcherEntityModel(context.getPart(WatcherEntityModel.LAYER)), 0.55f);
+        super(context, new WatcherEntityModel<>(context.getPart(WatcherEntityModel.LAYER)), 0.55f);
     }
 
     @Override

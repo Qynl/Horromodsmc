@@ -195,13 +195,13 @@ public final class DreadManager {
 
         // Scare events, gated by Dread thresholds.
         if (dread >= 25.0f && world.random.nextInt(700) == 0) {
-            player.playSound(SoundEvents.AMBIENT_CAVE, 0.55f, 0.5f + world.random.nextFloat() * 0.5f);
+            player.playSound(SoundEvents.AMBIENT_CAVE.value(), 0.55f, 0.5f + world.random.nextFloat() * 0.5f);
         }
         if (dread >= 45.0f && world.random.nextInt(600) == 0) {
             snuffTorch(world, player);
         }
         if (dread >= 55.0f && world.random.nextInt(900) == 0) {
-            player.playSound(SoundEvents.BLOCK_GRAVEL_STEP, 0.9f, 0.55f);
+            player.playSound(SoundEvents.BLOCK_GRAVEL_STEP.value(), 0.9f, 0.55f);
         }
         if (dread >= 70.0f && world.random.nextInt(1200) == 0) {
             summonApparition(world, player);
@@ -269,7 +269,7 @@ public final class DreadManager {
         apparition.refreshPositionAndAngles(ground.getX() + 0.5, ground.getY(), ground.getZ() + 0.5, yaw, 0.0f);
 
         if (world.spawnEntity(apparition)) {
-            player.playSound(SoundEvents.ENTITY_GHAST_SCREAM, 0.5f, 1.5f);
+            player.playSound(SoundEvents.ENTITY_GHAST_SCREAM.value(), 0.5f, 1.5f);
             player.sendMessage(Text.translatable("hollow.dread.presence")
                     .formatted(Formatting.DARK_PURPLE, Formatting.ITALIC), true);
         }
@@ -302,7 +302,7 @@ public final class DreadManager {
                     world.random.nextFloat() * 360.0f, 0.0f);
             watcher.setPersistent();
             if (world.spawnEntity(watcher)) {
-                player.playSound(SoundEvents.AMBIENT_CAVE, 0.8f, 0.4f);
+                player.playSound(SoundEvents.AMBIENT_CAVE.value(), 0.8f, 0.4f);
                 return;
             }
         }
