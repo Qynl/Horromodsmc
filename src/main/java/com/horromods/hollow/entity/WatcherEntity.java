@@ -72,7 +72,7 @@ public class WatcherEntity extends HostileEntity {
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
-        return HostileEntity.createMonsterAttributes()
+        return HostileEntity.createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 60.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.32)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 7.0)
