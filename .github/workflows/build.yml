@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,17 +46,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo "Hollow CI build failed. Error excerpt:"
-            echo '~~~'
-            grep -E -B1 -A4 'error:|What went wrong:|Caused by:|FAILURE:' build.log | head -100 || true
-            echo '~~~'
-            echo 'tail of log:'
-            echo '~~~'
-            tail -60 build.log || true
-            echo '~~~'
-          } > /tmp/excerpt.txt
+            echo '### :x: Build failed'
+            echo '#### What went wrong'
+            echo '```'
+            grep -A 30 "What went wrong" build.log | head -40 || true
+            echo '```'
+            echo '#### Compiler output'
+            echo '```'
+            sed -n '/:compileJava/,/BUILD FAILED/p' build.log | grep -vE "^[0-9]+ actionable|^$" | head -90 || true
+            echo '```'
+          } > /tmp/comment.md
           gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
-            -f body="$(cat /tmp/excerpt.txt)" || true
+            -f body="$(cat /tmp/comment.md)" >/dev/null || true
 
       - name: Upload mod jar
         uses: actions/upload-artifact@v4
