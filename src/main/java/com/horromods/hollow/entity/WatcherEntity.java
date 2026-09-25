@@ -185,7 +185,7 @@ public class WatcherEntity extends HostileEntity {
                 double distance = Math.sqrt(player.squaredDistanceTo(this));
                 if (distance < 24.0) {
                     float volume = MathHelper.clamp((float) (1.3 - distance / 24.0), 0.15f, 1.3f);
-                    player.playSound(SoundEvents.ENTITY_WARDEN_HEARTBEAT.value(), volume, 0.8f);
+                    player.playSound(SoundEvents.ENTITY_WARDEN_HEARTBEAT, volume, 0.8f);
                 }
                 if (distance < 10.0) {
                     player.addStatusEffect(
@@ -311,12 +311,12 @@ public class WatcherEntity extends HostileEntity {
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ENTITY_ENDERMAN_HURT.value();
+        return SoundEvents.ENTITY_ENDERMAN_HURT;
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_ENDERMAN_DEATH.value();
+        return SoundEvents.ENTITY_ENDERMAN_DEATH;
     }
 
     @Override

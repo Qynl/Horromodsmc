@@ -201,13 +201,53 @@ public final class DreadManager {
             snuffTorch(world, player);
         }
         if (dread >= 55.0f && world.random.nextInt(900) == 0) {
-            player.playSound(SoundEvents.BLOCK_GRAVEL_STEP.value(), 0.9f, 0.55f);
+            player.playSound(SoundEvents.BLOCK_GRAVEL_STEP, 0.9f, 0.55f);
         }
         if (dread >= 70.0f && world.random.nextInt(1200) == 0) {
             summonApparition(world, player);
         }
         if (dread >= 85.0f && world.random.nextInt(800) == 0) {
             summonWatcher(world, player);
+        }
+
+        // Rare natural manifestation: true darkness draws one even below peak Dread.
+        if (Hollow.CONFIG.watcherEnabled && time % 20L == 0L && world.random.nextInt(90) == 0) {
+            naturalSpawn(world, player);
+        }
+    }
+
+    /**
+     * Vanilla's spawn-restriction registry is private in 1.21.1, so natural
+     * Watcher spawns are handled here with our own, stricter rules: only in
+     * real darkness, never near Hallowed Lanterns, capped per player, and
+     * never persistent.
+     */
+    private static void naturalSpawn(ServerWorld world, ServerPlayerEntity player) {
+        if (world.getLightLevel(player.getBlockPos()) > 4) {
+            return;
+        }
+        int near = world.getEntitiesByClass(WatcherEntity.class,
+                player.getBoundingBox().expand(64.0), watcher -> true).size();
+        if (near >= 2) {
+            return;
+        }
+        for (int attempt = 0; attempt < 10; attempt++) {
+            double angle = world.random.nextDouble() * MathHelper.TAU;
+            double distance = 14.0 + world.random.nextDouble() * 10.0;
+            BlockPos base = player.getBlockPos().add(
+                    (int) (Math.cos(angle) * distance), 0, (int) (Math.sin(angle) * distance));
+            if (lanternNearby(world, base, 12)) {
+                continue;
+            }
+            BlockPos ground = HollowUtil.findGround(world, base, 8);
+            if (ground == null || world.getLightLevel(ground) > 4) {
+                continue;
+            }
+            WatcherEntity watcher = new WatcherEntity(ModEntities.WATCHER, world);
+            watcher.refreshPositionAndAngles(ground.getX() + 0.5, ground.getY(), ground.getZ() + 0.5,
+                    world.random.nextFloat() * 360.0f, 0.0f);
+            world.spawnEntity(watcher);
+            return;
         }
     }
 
@@ -269,7 +309,7 @@ public final class DreadManager {
         apparition.refreshPositionAndAngles(ground.getX() + 0.5, ground.getY(), ground.getZ() + 0.5, yaw, 0.0f);
 
         if (world.spawnEntity(apparition)) {
-            player.playSound(SoundEvents.ENTITY_GHAST_SCREAM.value(), 0.5f, 1.5f);
+            player.playSound(SoundEvents.ENTITY_GHAST_SCREAM, 0.5f, 1.5f);
             player.sendMessage(Text.translatable("hollow.dread.presence")
                     .formatted(Formatting.DARK_PURPLE, Formatting.ITALIC), true);
         }

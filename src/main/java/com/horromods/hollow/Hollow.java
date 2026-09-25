@@ -6,10 +6,7 @@ import com.horromods.hollow.entity.ModEntities;
 import com.horromods.hollow.item.ModItems;
 import com.horromods.hollow.network.DreadPayload;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.registry.tag.BiomeTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +34,6 @@ public final class Hollow implements ModInitializer {
         ModBlocks.register();
         ModEntities.register();
         DreadManager.register();
-
-        // Rare natural spawns in dark corners of the overworld.
-        if (CONFIG.watcherEnabled) {
-            BiomeModifications.addSpawn(
-                    biome -> biome.hasTag(BiomeTags.IS_OVERWORLD),
-                    SpawnGroup.MONSTER,
-                    ModEntities.WATCHER,
-                    CONFIG.watcherSpawnWeight, 1, 1);
-        }
 
         LOGGER.info("Hollow is watching.");
     }
