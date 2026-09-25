@@ -5,7 +5,11 @@
   "item.hollow.shadow_fragment": "Shadow Fragment",
   "item.hollow.shadow_fragment.tooltip": "A sliver of solidified dark. It is still cold.",
   "item.hollow.warding_totem": "Warding Totem",
-  "item.hollow.warding_totem.tooltip": "Keep it on you. The Watcher cannot bear its gaze.",
+  "item.hollow.warding_totem.tooltip": "Keep it on you. The Watcher cannot bear its gaze. It cracks each time it wards you.",
+  "item.hollow.warding_totem.flare": "Your Warding Totem flares, holding the gaze at bay...",
+  "item.hollow.warding_totem.broken": "Your Warding Totem crumbles to dust!",
+  "item.hollow.third_eye": "Third Eye",
+  "item.hollow.third_eye.tooltip": "Hold to perceive your Dread and reveal Watchers through the dark.",
   "item.hollow.watcher_spawn_egg": "Watcher Spawn Egg",
 
   "block.hollow.hallowed_lantern": "Hallowed Lantern",

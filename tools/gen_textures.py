@@ -248,6 +248,78 @@ def apparition():
     canvas.save(os.path.join(ASSETS, "textures", "entity", "apparition.png"))
 
 
+def watcher_pale():
+    """Rare variant: bone-pale body, black eye sockets ringed in dried red."""
+    rng = random.Random(23)
+    canvas = Canvas(64, 64)
+    for (x0, y0, x1, y1) in _watcher_layout_base():
+        smoke(canvas, x0, y0, x1, y1, (158, 156, 168), 10, rng)
+
+    for y in range(8, 16):
+        for x in range(8, 16):
+            value = rng.randint(-5, 7)
+            canvas.set(x, y, tuple(clamp_channel(c + value) for c in (178, 176, 188)))
+
+    halo = [(8, 11), (11, 11), (12, 11), (15, 11),
+            (9, 10), (10, 10), (13, 10), (14, 10),
+            (9, 12), (10, 12), (13, 12), (14, 12)]
+    for (x, y) in halo:
+        canvas.set(x, y, (122, 28, 38))
+    for (x, y) in ((9, 11), (10, 11), (13, 11), (14, 11)):
+        canvas.set(x, y, (14, 10, 14))
+
+    canvas.save(os.path.join(ASSETS, "textures", "entity", "watcher_pale.png"))
+
+
+def third_eye():
+    rng = random.Random(31)
+    canvas = Canvas(16, 16)
+    rows = {5: (6, 9), 6: (4, 11), 7: (3, 12), 8: (3, 12), 9: (4, 11), 10: (6, 9)}
+    mask = set()
+    for y, (x0, x1) in rows.items():
+        for x in range(x0, x1 + 1):
+            mask.add((x, y))
+
+    for (x, y) in sorted(mask):
+        jitter = rng.randint(-6, 6)
+        canvas.set(x, y, tuple(clamp_channel(c + jitter) for c in (232, 228, 218)))
+
+    # Iris and slit pupil.
+    for (x, y) in sorted(mask):
+        if (x - 7.5) ** 2 + (y - 7.5) ** 2 <= 6.5:
+            canvas.set(x, y, (150, 95, 225))
+    for y in range(6, 10):
+        for x in (7, 8):
+            if (x, y) in mask:
+                canvas.set(x, y, (15, 10, 20))
+
+    # Gilded lids and outline.
+    for (x, y) in sorted(mask):
+        if y in (5, 10) or (x, y) in ((4, 6), (11, 6), (4, 9), (11, 9)):
+            canvas.set(x, y, (160, 128, 64))
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if (x + dx, y + dy) not in mask:
+                canvas.set(x, y, (40, 30, 50))
+                break
+
+    canvas.save(os.path.join(ASSETS, "textures", "item", "third_eye.png"))
+
+
+def vignette():
+    """256x256 radial dark-purple vignette; alpha grows toward the edges."""
+    rng = random.Random(41)
+    canvas = Canvas(256, 256)
+    for y in range(256):
+        for x in range(256):
+            distance = ((x - 127.5) ** 2 + (y - 127.5) ** 2) ** 0.5 / 181.0
+            t = max(0.0, min(1.0, (distance - 0.42) / 0.58))
+            alpha = int(235 * (t ** 1.6)) + rng.randint(-4, 4)
+            if alpha <= 0:
+                continue
+            canvas.set(x, y, (12, 4, 18, max(0, min(255, alpha))))
+    canvas.save(os.path.join(ASSETS, "textures", "gui", "dread_vignette.png"))
+
+
 def icon():
     rng = random.Random(13)
     canvas = Canvas(64, 64)
@@ -292,7 +364,10 @@ def main():
     warding_totem()
     hallowed_lantern()
     watcher()
+    watcher_pale()
     apparition()
+    third_eye()
+    vignette()
     icon()
     print("Textures written to", os.path.normpath(ASSETS))
 

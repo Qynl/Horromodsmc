@@ -13,6 +13,7 @@ public class WatcherEntityRenderer extends MobEntityRenderer<WatcherEntity, Watc
 
     @Override
     public Identifier getTexture(WatcherEntity entity) {
-        return Identifier.of(Hollow.MOD_ID, "textures/entity/watcher.png");
+        return Identifier.of(Hollow.MOD_ID,
+                entity.isPale() ? "textures/entity/watcher_pale.png" : "textures/entity/watcher.png");
     }
 }

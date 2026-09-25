@@ -1,0 +1,27 @@
+{
+  "parent": "hollow:root",
+  "display": {
+    "icon": {
+      "item": "hollow:third_eye"
+    },
+    "title": "Seer",
+    "description": "Craft a Third Eye and look upon your own Dread.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "third_eye": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "hollow:third_eye"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "parent": "hollow:root",
+  "display": {
+    "icon": {
+      "item": "hollow:hallowed_lantern"
+    },
+    "title": "Light Against the Dark",
+    "description": "Craft a Hallowed Lantern and hold the night at bay.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "lantern": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "hollow:hallowed_lantern"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

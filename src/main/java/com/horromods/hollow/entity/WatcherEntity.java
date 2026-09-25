@@ -1,11 +1,14 @@
 package com.horromods.hollow.entity;
 
+import com.horromods.hollow.Hollow;
 import com.horromods.hollow.item.ModItems;
 import com.horromods.hollow.util.HollowUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
@@ -32,6 +35,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.LightType;
+import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -56,6 +60,8 @@ public class WatcherEntity extends MonsterEntity {
     private int stareTicks;
     private int blinkCount;
     private int fadeTicks;
+    private int wardCooldown;
+    private boolean pale;
 
     public WatcherEntity(EntityType<? extends MonsterEntity> entityType, World world) {
         super(entityType, world);
@@ -102,11 +108,44 @@ public class WatcherEntity extends MonsterEntity {
 
     @Override
     public void setTarget(@Nullable LivingEntity target) {
-        // A Warding Totem hides its bearer from The Watcher entirely.
+        // A Warding Totem hides its bearer from The Watcher entirely —
+        // but every such ward cracks the totem a little more.
         if (target instanceof PlayerEntity player && ModItems.hasWardingTotem(player)) {
+            if (this.wardCooldown <= 0) {
+                this.wardCooldown = 600;
+                ModItems.wardAttempt(player);
+            }
             return;
         }
         super.setTarget(target);
+    }
+
+    /** The rare Pale Watcher is bolder and tolerates being stared at longer. */
+    public boolean isPale() {
+        return this.pale;
+    }
+
+    private int maxBlinks() {
+        return this.pale ? MAX_BLINKS + 3 : MAX_BLINKS;
+    }
+
+    @Override
+    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty,
+            SpawnReason spawnReason, @Nullable EntityData entityData) {
+        this.pale = world.getRandom().nextFloat() < Hollow.CONFIG.paleWatcherChance;
+        return super.initialize(world, difficulty, spawnReason, entityData);
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putBoolean("pale", this.pale);
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        this.pale = nbt.getBoolean("pale");
     }
 
     @Override
@@ -114,6 +153,9 @@ public class WatcherEntity extends MonsterEntity {
         super.tick();
         if (this.getWorld().isClient) {
             return;
+        }
+        if (this.wardCooldown > 0) {
+            this.wardCooldown--;
         }
         ServerWorld world = (ServerWorld) this.getWorld();
 
@@ -155,7 +197,7 @@ public class WatcherEntity extends MonsterEntity {
             this.stareTicks++;
             if (this.stareTicks >= STARE_TELEPORT_TICKS) {
                 this.stareTicks = 0;
-                if (this.blinkCount >= MAX_BLINKS) {
+                if (this.blinkCount >= this.maxBlinks()) {
                     world.spawnParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY() + 1.2, this.getZ(),
                             30, 0.5, 1.2, 0.5, 0.03);
                     this.discard();

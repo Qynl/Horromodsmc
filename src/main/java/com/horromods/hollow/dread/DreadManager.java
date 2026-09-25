@@ -6,10 +6,12 @@ import com.horromods.hollow.entity.ApparitionEntity;
 import com.horromods.hollow.entity.ModEntities;
 import com.horromods.hollow.entity.WatcherEntity;
 import com.horromods.hollow.item.ModItems;
+import com.horromods.hollow.network.DreadPayload;
 import com.horromods.hollow.util.HollowUtil;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -118,37 +120,57 @@ public final class DreadManager {
         // Expensive proximity checks run once a second and are cached.
         if (time % 20L == 0L) {
             NEAR_LANTERN.put(id, lanternNearby(world, pos, 8));
-            WATCHER_NEAR.put(id, !world.getEntitiesByClass(WatcherEntity.class,
-                    player.getBoundingBox().expand(24.0), watcher -> true).isEmpty());
+            boolean anyWatcher = !world.getEntitiesByClass(WatcherEntity.class,
+                    player.getBoundingBox().expand(24.0), watcher -> true).isEmpty();
+            WATCHER_NEAR.put(id, anyWatcher);
+
+            // The Third Eye reveals Watchers through the dark.
+            if (ModItems.holdsThirdEye(player)) {
+                for (WatcherEntity watcher : world.getEntitiesByClass(WatcherEntity.class,
+                        player.getBoundingBox().expand(24.0), w -> true)) {
+                    watcher.addStatusEffect(
+                            new StatusEffectInstance(StatusEffects.GLOWING, 40, 0, false, false, false));
+                }
+            }
         }
         boolean nearLantern = NEAR_LANTERN.getOrDefault(id, false);
         boolean watcherNear = WATCHER_NEAR.getOrDefault(id, false);
         boolean warded = ModItems.hasWardingTotem(player);
 
-        float rate = 0.0f;
+        float gain = 0.0f;
         if (world.isNight() && light < 7) {
-            rate += 0.05f;
+            gain += 0.05f;
         }
         if (light <= 2) {
-            rate += 0.04f;
+            gain += 0.04f;
         }
         if (watcherNear) {
-            rate += 0.1f;
+            gain += 0.1f;
         }
         if (warded) {
-            rate *= 0.25f;
+            gain *= 0.25f;
         }
+        gain *= Hollow.CONFIG.dreadMultiplier;
+
+        float drain = 0.0f;
         if (light >= 8) {
-            rate -= 0.06f;
+            drain += 0.06f;
         }
         if (nearLantern) {
-            rate -= 0.06f;
+            drain += 0.06f;
         }
+
+        float rate = gain - drain;
         if (rate == 0.0f) {
             rate = -0.005f;
         }
         dread = MathHelper.clamp(dread + rate, 0.0f, 100.0f);
         DREAD.put(id, dread);
+
+        // Keep the client HUD in the loop.
+        if (time % 20L == 0L) {
+            ServerPlayNetworking.send(player, new DreadPayload(dread));
+        }
 
         // Whisper something when crossing a threshold.
         int from = tier(before);

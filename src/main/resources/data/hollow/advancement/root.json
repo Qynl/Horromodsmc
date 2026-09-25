@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "hollow:shadow_fragment"
+    },
+    "title": "Hollow",
+    "description": "Find a Shadow Fragment. Something shed it.",
+    "background": "minecraft:textures/block/black_concrete.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "fragment": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "hollow:shadow_fragment"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

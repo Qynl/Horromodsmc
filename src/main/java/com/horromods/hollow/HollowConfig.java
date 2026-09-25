@@ -22,6 +22,10 @@ public class HollowConfig {
     public boolean eventsEnabled = true;
     /** Spawn weight of The Watcher in dark overworld spots (zombies are 95). */
     public int watcherSpawnWeight = 6;
+    /** Multiplier on all Dread gain (0 disables natural buildup). */
+    public float dreadMultiplier = 1.0f;
+    /** Chance that a naturally spawning Watcher is the rare Pale variant. */
+    public float paleWatcherChance = 0.1f;
 
     public static HollowConfig load() {
         Path path = FabricLoader.getInstance().getConfigDir().resolve("hollow.json");

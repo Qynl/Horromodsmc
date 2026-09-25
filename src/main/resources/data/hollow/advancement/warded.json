@@ -1,0 +1,27 @@
+{
+  "parent": "hollow:root",
+  "display": {
+    "icon": {
+      "item": "hollow:warding_totem"
+    },
+    "title": "Safe Keeping",
+    "description": "Craft a Warding Totem and carry it in the dark.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "totem": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "hollow:warding_totem"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

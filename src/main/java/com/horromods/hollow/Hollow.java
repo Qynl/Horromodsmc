@@ -4,8 +4,10 @@ import com.horromods.hollow.block.ModBlocks;
 import com.horromods.hollow.dread.DreadManager;
 import com.horromods.hollow.entity.ModEntities;
 import com.horromods.hollow.item.ModItems;
+import com.horromods.hollow.network.DreadPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.tag.BiomeTags;
 import org.slf4j.Logger;
@@ -28,6 +30,8 @@ public final class Hollow implements ModInitializer {
     @Override
     public void onInitialize() {
         CONFIG = HollowConfig.load();
+
+        PayloadTypeRegistry.playS2C().register(DreadPayload.ID, DreadPayload.CODEC);
 
         ModItems.register();
         ModBlocks.register();
