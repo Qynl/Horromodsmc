@@ -21,7 +21,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.MonsterEntity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
@@ -53,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
  *   <li>A Warding Totem hides a player from its gaze entirely.</li>
  * </ul>
  */
-public class WatcherEntity extends MonsterEntity {
+public class WatcherEntity extends HostileEntity {
     private static final int STARE_TELEPORT_TICKS = 14;
     private static final int MAX_BLINKS = 6;
 
@@ -63,7 +63,7 @@ public class WatcherEntity extends MonsterEntity {
     private int wardCooldown;
     private boolean pale;
 
-    public WatcherEntity(EntityType<? extends MonsterEntity> entityType, World world) {
+    public WatcherEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
         this.setPathfindingPenalty(PathNodeType.WATER, -1.0f);
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0f);
@@ -72,7 +72,7 @@ public class WatcherEntity extends MonsterEntity {
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
-        return MonsterEntity.createMonsterAttributes()
+        return HostileEntity.createMonsterAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 60.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.32)
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 7.0)
@@ -92,7 +92,7 @@ public class WatcherEntity extends MonsterEntity {
         if (world.getLightLevel(LightType.SKY, pos) > 4) {
             return false;
         }
-        return MonsterEntity.canSpawnInDark(type, world, spawnReason, pos, random);
+        return HostileEntity.canSpawnInDark(type, world, spawnReason, pos, random);
     }
 
     @Override
