@@ -120,8 +120,8 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         // Open space: air inside (flooded on Level 7), ceiling on top.
         for (int y = Level0Layout.WALL_MIN_Y; y < ceilingY; y++) {
             mutable.set(x, y, z);
-            if (levelId == 7 && y < ceilingY - 1) {
-                // Thalassophobia: the corridor is ocean; leave an air gap to surface into.
+            if (levelId == 7 && y < ceilingY - 2) {
+                // Thalassophobia: the corridor is ocean; leave a two-block air gap to surface into.
                 world.setBlockState(mutable, Blocks.WATER.getDefaultState(), 3);
             } else {
                 world.setBlockState(mutable, Blocks.AIR.getDefaultState(), 3);
@@ -366,7 +366,7 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
 
     private static boolean wallWindowRoll(int x, int z) {
         long h = ((long) x * 0x8DA6B343D192ED03L) ^ ((long) z * 0xD1B54A32D192ED03L);
-        return Math.floorMod(h >>> 41, 1000) < 60;
+        return Math.floorMod(h >>> 41, 1000) < 25;
     }
 
     private static BlockState withVariant(BlockState state, int variant) {

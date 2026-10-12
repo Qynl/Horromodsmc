@@ -1,5 +1,6 @@
 package dev.qynl.backrooms.horror;
 
+import dev.qynl.backrooms.config.BackroomsConfig;
 import dev.qynl.backrooms.registry.ModEntityTypes;
 import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.minecraft.entity.Entity;
@@ -98,7 +99,7 @@ public class ListenerEntity extends Entity {
             if (dist < nearest) nearest = dist;
             float loud = loudness(player);
             if (loud <= 0f) continue;                       // sneaking: invisible to it
-            float radius = 14f * (0.4f + loud);             // sprint ~19.6, walk ~13
+            float radius = BackroomsConfig.get().listenerHearing * (0.4f + loud);
             if (dist < radius && loud > heard) {
                 heard = loud;
                 quarry = player;

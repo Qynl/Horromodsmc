@@ -33,14 +33,16 @@
       {
         "name": "backrooms:carpet_step2"
       }
-    ]
+    ],
+    "subtitle": "subtitles.backrooms.carpet_step"
   },
   "carpet_place": {
     "sounds": [
       {
         "name": "backrooms:carpet_step"
       }
-    ]
+    ],
+    "subtitle": "subtitles.backrooms.carpet_place"
   },
   "carpet_break": {
     "sounds": [
@@ -50,7 +52,8 @@
       {
         "name": "backrooms:carpet_step2"
       }
-    ]
+    ],
+    "subtitle": "subtitles.backrooms.carpet_break"
   },
   "distant_noise": {
     "sounds": [
@@ -65,7 +68,8 @@
       {
         "name": "backrooms:wall_sound"
       }
-    ]
+    ],
+    "subtitle": "subtitles.backrooms.wall_sound"
   },
   "phantom_footstep": {
     "sounds": [
@@ -96,7 +100,8 @@
       {
         "name": "backrooms:tear_ambient"
       }
-    ]
+    ],
+    "subtitle": "subtitles.backrooms.tear_ambient"
   },
   "listener_idle": {
     "sounds": [

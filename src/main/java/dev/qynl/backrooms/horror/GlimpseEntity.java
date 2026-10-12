@@ -53,6 +53,9 @@ public class GlimpseEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        if (getWorld().isClient()) {
+            return;   // the server decides when it is gone; the client just stops seeing it
+        }
         age++;
         if (age > 50) {   // ~2.5 seconds
             discard();

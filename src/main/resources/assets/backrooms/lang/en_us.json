@@ -64,5 +64,10 @@
   "backrooms.level7": "Level 7 - Thalassophobia",
   "backrooms.level8": "Level 8 - Cave System",
   "block.backrooms.escape_hatch": "Escape Hatch",
-  "itemGroup.backrooms.main": "The Backrooms"
+  "itemGroup.backrooms.main": "The Backrooms",
+  "subtitles.backrooms.carpet_step": "Carpet compresses",
+  "subtitles.backrooms.carpet_place": "Carpet laid",
+  "subtitles.backrooms.carpet_break": "Carpet torn",
+  "subtitles.backrooms.wall_sound": "Something moves inside the wall",
+  "subtitles.backrooms.tear_ambient": "A tear hums"
 }

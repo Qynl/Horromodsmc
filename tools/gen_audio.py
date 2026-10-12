@@ -33,6 +33,22 @@ def lowpass(x, alpha=0.08):
     return y
 
 
+def loop_noise(d, seed, components=28, base=6):
+    """Noise that loops perfectly: a sum of integer-cycle sines over the bed length."""
+    x = t(d)
+    r = np.random.default_rng(seed)
+    out = np.zeros_like(x)
+    amp = 1.0
+    for o in range(3):
+        for _ in range(components // 3):
+            k = int(r.integers(base, base * 4))
+            ph = r.random() * 2 * np.pi
+            out += amp * np.sin(2 * np.pi * k * x / d + ph)
+        amp *= 0.6
+        base *= 3
+    return out / max(np.max(np.abs(out)), 1e-9)
+
+
 def norm(x, peak=0.9):
     m = np.max(np.abs(x))
     if m <= 1e-9:
@@ -52,7 +68,7 @@ def write_wav(path, x):
 
 def to_ogg(wav, ogg):
     subprocess.run([FFMPEG, "-y", "-loglevel", "error", "-i", wav,
-                    "-c:a", "libvorbis", "-q:a", "3", ogg], check=True)
+                    "-c:a", "libvorbis", "-q:a", "4", ogg], check=True)
     os.remove(wav)
 
 
@@ -66,11 +82,15 @@ def emit(name, x):
 def buzz():
     d = 2.0
     x = t(d)
-    s = (0.50 * np.sin(2 * np.pi * 120 * x)
-         + 0.22 * np.sin(2 * np.pi * 240 * x)
-         + 0.10 * np.sin(2 * np.pi * 360 * x)
-         + 0.03 * np.random.default_rng(1).standard_normal(x.size))
-    s *= 0.9 + 0.1 * np.sin(2 * np.pi * 2 * x)   # slow waver
+    ballast = (0.50 * np.sin(2 * np.pi * 120 * x)
+               + 0.22 * np.sin(2 * np.pi * 240 * x)
+               + 0.10 * np.sin(2 * np.pi * 360 * x))
+    hiss = 0.045 * loop_noise(d, 1, base=90)          # tube hiss, loops cleanly
+    rattle = 0.05 * loop_noise(d, 11, base=14)        # loose frame rattling at ~14 Hz
+    s = ballast + hiss + rattle
+    s *= 0.9 + 0.1 * np.sin(2 * np.pi * 2 * x)        # slow waver
+    click = np.exp(-np.abs(x - 1.0) * 900)            # starter tick once per loop
+    s += 0.25 * np.sin(2 * np.pi * 2400 * x) * click
     emit("buzz", norm(s, 0.5))
 
 
@@ -78,9 +98,10 @@ def hum():
     d = 2.0
     x = t(d)
     rng = np.random.default_rng(2)
-    s = (0.6 * np.sin(2 * np.pi * 50 * x)
-         + 0.2 * np.sin(2 * np.pi * 100 * x)
-         + 0.05 * lowpass(rng.standard_normal(x.size)))
+    breath = 0.85 + 0.15 * np.sin(2 * np.pi * 0.5 * x)   # the building breathing
+    s = ((0.6 * np.sin(2 * np.pi * 50 * x)
+          + 0.2 * np.sin(2 * np.pi * 100 * x)
+          + 0.06 * loop_noise(d, 2, base=3)) * breath)
     emit("hum", norm(s, 0.35))
 
 
@@ -97,7 +118,10 @@ def drip():
 def step(name, dur, seed, vol):
     x = t(dur)
     rng = np.random.default_rng(seed)
-    s = lowpass(rng.standard_normal(x.size), 0.15) * np.exp(-x * 30)
+    thud = lowpass(rng.standard_normal(x.size), 0.15) * np.exp(-x * 30)
+    rustle = (rng.standard_normal(x.size) - rng.standard_normal(x.size)) * 0.5
+    rustle = lowpass(rustle, 0.5) - lowpass(rustle, 0.12)     # band-passed fibre rustle
+    s = thud + 0.35 * rustle * np.exp(-x * 14)
     emit(name, norm(s, vol))
 
 
@@ -131,7 +155,8 @@ def flicker():
 def thump():
     d = 0.4
     x = t(d)
-    s = np.sin(2 * np.pi * 58 * x) * np.exp(-x * 9)
+    s = (np.sin(2 * np.pi * 58 * x) + 0.4 * np.sin(2 * np.pi * 116 * x)) * np.exp(-x * 9)
+    s += 0.12 * lowpass(np.random.default_rng(10).standard_normal(x.size), 0.3) * np.exp(-x * 90)
     emit("thump", norm(s, 0.8))
 
 
@@ -155,14 +180,17 @@ def listener_step():
     d = 0.22
     x = t(d)
     rng = np.random.default_rng(13)
-    s = lowpass(rng.standard_normal(x.size), 0.1) * np.exp(-x * 18) + 0.4 * np.sin(2 * np.pi * 70 * x) * np.exp(-x * 20)
-    emit("listener_step", norm(s, 0.7))
+    heel = lowpass(rng.standard_normal(x.size), 0.1) * np.exp(-x * 18) + 0.4 * np.sin(2 * np.pi * 70 * x) * np.exp(-x * 20)
+    toe = 0.5 * (lowpass(rng.standard_normal(x.size), 0.12) * np.exp(-np.abs(x - 0.11) * 26))
+    emit("listener_step", norm(heel + toe, 0.7))
 
 def tear_ambient():
     d = 2.0
     x = t(d)
     rng = np.random.default_rng(9)
-    s = 0.5 * lowpass(rng.standard_normal(x.size), 0.03) + 0.1 * np.sin(2 * np.pi * 900 * x) * 0.2
+    shimmer = (0.10 * np.sin(2 * np.pi * 880 * x) + 0.10 * np.sin(2 * np.pi * 884 * x)
+               + 0.06 * np.sin(2 * np.pi * 1320 * x))          # 4 Hz beat: it is almost a voice
+    s = 0.5 * loop_noise(d, 9, base=2) + shimmer * (0.6 + 0.4 * np.sin(2 * np.pi * 0.25 * x))
     emit("tear_ambient", norm(s, 0.2))
 
 

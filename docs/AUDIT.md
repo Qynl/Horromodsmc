@@ -214,3 +214,64 @@ pinned at max forever and maps leaked per UUID. `ServerPlayConnectionEvents.DISC
 3. P2-1 (art) — single biggest perceived-quality win.
 4. P2-3/P2-4 (light & audio mood), then P2-5 (discovery).
 5. P3 content, gated behind P1-9's entity rework.
+
+---
+
+# Round 2 — quality pass (second commit on this branch)
+
+After the P0/P1 fixes the mod *worked*; this round makes it not feel cheap. Everything below was
+generated and measured in-repo, not hand-waved.
+
+## Art (the biggest perceived-quality problem, now addressed)
+`tools/gen_textures.py` was rewritten around five rules (readable structure, tileable noise via
+integer-frequency sines, one light direction with 1px bevels, ordered dithering, a per-material
+value-contrast budget). Before/after: wallpaper now has stripes and damp streaks instead of yellow
+mush; carpet has tuft; ceiling tiles have a perforation grid and water rings; brick has courses and
+mortar; pipes are pipes; the vending machine has glass, cans, a keypad and a coin slot.
+Entity textures went from 16px stretched over 2.6 m bodies to real silhouettes: Listener 64x128
+(too-long arms, pinprick eyes, rim light), Smiler 64x64 grin with teeth, Hound 64x48 quadruped,
+Skin-Stealer 64x128 keeping its renderer UV contract (head in x[0.25,0.75], y[0,0.35]).
+
+Measured (5th-95th percentile luminance spread per texture): median **62/255**, lowest are the
+deliberately flat surfaces (void gradient 28, faded wallpaper 34). The old set measured as blur.
+
+Block **geometry** also improved (asset-only, no Java risk): fluorescent fixtures are now recessed
+panels (frame ring + diffuser slab) instead of full cubes; `metal_bars` is a real gate of posts and
+crossed rails; `debris_pile` is a low heap; `water_cooler` is cabinet + bottle + tap.
+
+## Audio
+The looping beds (`buzz`, `hum`, `tear_ambient`) used white noise, which does not loop: every 2 s
+there was an audible click at the seam. They now use `loop_noise()` (integer-cycle sine sums).
+Measured loop discontinuity (|first - last| sample): **buzz 0.006, hum 0.0005, tear_ambient 0.006**
+(previously ~0.1+). Buzz gained ballast rattle and a once-per-loop starter tick; hum breathes at
+0.5 Hz; carpet steps gained a band-passed fibre rustle; the Listener's step gained a heel/toe
+double-tap; `thump` is no longer an inaudible pure 58 Hz sine. Encode quality q3 -> q4.
+
+## Gameplay polish
+- `listenerHearing` config knob was dead (hardcoded 14) - now wired into the Listener's hearing radius.
+- Level 7 arrival: two-block air pocket to surface into instead of one.
+- Level 4 blacked-out windows: 60% of wall columns -> 25% (a wall of windows is noise, not mood).
+- Glimpse discard is server-authoritative (client no longer deletes its own copy independently).
+- Paranoia/horror state now resets when a player *leaves* the Backrooms, not only on disconnect.
+- Missing subtitles wired (`carpet_*`, `wall_sound`, `tear_ambient`) in `sounds.json` + lang.
+
+## Tests
+Three regression tests added to `Level0LayoutTest` (pure-core, run in CI):
+`freeStandingPillarsActuallyAppear` (guards the inverted-condition bug),
+`lightingIsReliableNearTheArrivalPoint`, `clutterIsSparseButPresent`.
+
+## Verification performed for this round
+| Check | Result |
+|---|---|
+| `python3 tools/validate_assets.py` | ALL ASSET CROSS-REFERENCES OK (156 json, 21 sounds, 35 blocks, 25 items) |
+| `python3 tools/layout_preview.py --selftest` | ALL CHECKS PASSED (connectivity, seams, ratios, drift, lighting decay) |
+| Java brace/paren balance over all sources | clean |
+| Texture contrast metric | median 62/255, no accidental mush |
+| Audio loop seam / peak / RMS | seams <= 0.006, peaks <= 0.93 (no clipping), beds RMS 0.18-0.25 |
+| Visual QC | contact sheets of all 41 block + 6 entity textures reviewed at 4x |
+
+## Still true, still on the roadmap
+No JDK/Minecraft maven access in this sandbox, so nothing here was compiled or playtested - CI
+(`.github/workflows/build.yml`) is the compile gate. Art direction is now structured but still
+procedural 16x16; a hand-authored pass would beat it. Entities are still billboards and still raw
+`Entity` (invulnerable, no pathfinding) - see P1-9 and P2-1..P2-5 above.

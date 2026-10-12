@@ -75,6 +75,58 @@ public class Level0LayoutTest {
     }
 
     @Test
+    void freeStandingPillarsActuallyAppear() {
+        // Regression: an inverted neighbour test once made pillars require four *solid* neighbours,
+        // i.e. a sealed pocket, so none ever generated outside HALL/HUB districts.
+        Level0Layout layout = new Level0Layout(1234567L);
+        int r = 4 * N;
+        int pillars = 0;
+        for (int x = -r / 2; x < r / 2; x++) {
+            for (int z = -r / 2; z < r / 2; z++) {
+                if (!layout.isSolid(x, z) && layout.isPillar(x, z)) pillars++;
+            }
+        }
+        assertTrue(pillars > 100, "expected free-standing pillars in the maze, got " + pillars);
+    }
+
+    @Test
+    void lightingIsReliableNearTheArrivalPoint() {
+        Level0Layout layout = new Level0Layout(4242L);
+        int fixtures = 0;
+        int working = 0;
+        for (int x = -24; x < 24; x++) {
+            for (int z = -24; z < 24; z++) {
+                int light = layout.lightState(x, z);
+                if (light != Level0Layout.LIGHT_NONE) {
+                    fixtures++;
+                    if (light == Level0Layout.LIGHT_WORKING) working++;
+                }
+            }
+        }
+        assertTrue(fixtures > 20, "the arrival district should carry fixtures, got " + fixtures);
+        assertTrue(working * 10 >= fixtures * 8,
+                "near the arrival point most fixtures must work, got " + working + "/" + fixtures);
+    }
+
+    @Test
+    void clutterIsSparseButPresent() {
+        Level0Layout layout = new Level0Layout(99L);
+        int r = 4 * N;
+        int open = 0;
+        int props = 0;
+        for (int x = -r / 2; x < r / 2; x++) {
+            for (int z = -r / 2; z < r / 2; z++) {
+                if (layout.isSolid(x, z)) continue;
+                open++;
+                if (layout.propAt(x, z) != Level0Layout.PROP_NONE) props++;
+            }
+        }
+        assertTrue(props > 20, "an abandoned level still has things left in it, got " + props);
+        assertTrue(props * 100 <= open * 12,
+                "clutter must stay sparse (a furniture store is not horror): " + props + "/" + open);
+    }
+
+    @Test
     void regionIsMostlyConnected() {
         Level0Layout layout = new Level0Layout(1234567L);
         int R = 4 * N;

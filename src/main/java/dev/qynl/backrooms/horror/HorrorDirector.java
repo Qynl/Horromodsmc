@@ -11,6 +11,7 @@ import dev.qynl.backrooms.registry.ModEntityTypes;
 import dev.qynl.backrooms.registry.ModBlocks;
 import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.minecraft.block.BlockState;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -41,11 +42,13 @@ public final class HorrorDirector {
 
     private static final Map<UUID, Long> lastEvent = new HashMap<>();
     private static final Map<UUID, Long> firstSeen = new HashMap<>();
+    private static final Map<UUID, RegistryKey<World>> lastDim = new HashMap<>();
 
     /** Drops a departing player's psychological state so paranoia does not stay pinned forever. */
     public static void forgetPlayer(UUID id) {
         lastEvent.remove(id);
         firstSeen.remove(id);
+        lastDim.remove(id);
     }
     private static final List<Pending> pending = new ArrayList<>();
     private static long tick = 0;
@@ -78,7 +81,19 @@ public final class HorrorDirector {
                 Level0Holder.advanceDrift(world.getSeed(), theme.id());
             }
             for (ServerPlayerEntity player : world.getPlayers()) {
+                lastDim.put(player.getUuid(), world.getRegistryKey());
                 maybeEvents(world, player, cfg, theme.id());
+            }
+        }
+        // Leaving the Backrooms ends the session: paranoia starts over next time.
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            RegistryKey<World> key = player.getWorld().getRegistryKey();
+            RegistryKey<World> seen = lastDim.get(player.getUuid());
+            if (seen != null && !seen.equals(key)) {
+                lastDim.remove(player.getUuid());
+                if (!BackroomsLevels.isBackrooms(key)) {
+                    forgetPlayer(player.getUuid());
+                }
             }
         }
     }
