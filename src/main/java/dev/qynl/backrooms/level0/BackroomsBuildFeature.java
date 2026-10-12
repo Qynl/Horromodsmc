@@ -61,7 +61,7 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
         new BackroomsBuildFeature(levelId).paintChunk(world, cx, cz);
     }
 
-    private void paintColumn(StructureWorldAccess world, BlockPos.Mutable mutable,
+    private void paintColumn(ServerWorldAccess world, BlockPos.Mutable mutable,
                              Level0Layout layout, int x, int z) {
         int bits = layout.tileBits(x, z);
         boolean solid = (bits & Level0Layout.BIT_SOLID) != 0;
