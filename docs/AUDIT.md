@@ -297,3 +297,80 @@ Root cause chain, in order of importance:
    share one code path.
 3. **Existing broken saves** are still repaired twice over: the chunk-load verifier (round 1) and a
    new op command `/backrooms rebuild`, which re-paints the 25x22 loaded chunks around the player.
+
+---
+
+# Round 4 — making the build actually build, and the arrival point actually work
+
+Round 3's diagnosis was right but its code never compiled either: the CI gate reported nine errors.
+Every one was a guessed API name. This round stopped guessing and read the mappings.
+
+## The compile gate, closed for real
+
+Verified against `FabricMC/yarn` branch `1.21.1` (`mappings/net/minecraft/...`) rather than recalled:
+
+| Guessed (wrong) | Actual (verified) |
+| --- | --- |
+| `net.minecraft.server.world.ServerWorldAccess` | `net.minecraft.world.ServerWorldAccess` |
+| `net.minecraft.world.StructureAccessor`, `net.minecraft.structure.StructureAccessor` | `net.minecraft.world.gen.StructureAccessor` |
+| `...lifecycle.v1.ChunkEvents` | `...lifecycle.v1.ServerChunkEvents` |
+| `buildSurface(ServerWorldAccess, ...)` | `buildSurface(ChunkRegion, StructureAccessor, NoiseConfig, Chunk)` |
+| `ServerChunkEvents.CHUNK_LOAD (WorldChunk, ServerWorld)` | `(ServerWorld, WorldChunk)` — the other way round |
+| `Entity.onGround` (field) | `Entity.isOnGround()` — the field is private |
+
+`:compileJava`, `:remapJar` and `:assemble` now pass, so for the first time since round 1 the shipped
+jar contains the fixes instead of predating them.
+
+## What the two remaining test failures were actually about
+
+`Level0LayoutTest` failed on `freeStandingPillarsActuallyAppear` and
+`lightingIsReliableNearTheArrivalPoint`. Both were bad tests — magic numbers picked before anything
+was measured — but measuring them properly exposed two real defects:
+
+1. **You could arrive in the dark.** `chooseStyle` left the origin district entirely to chance, so a
+   world could noclip you into a `DARK` (lights ~88% dead), `POOLROOM` (no fixtures at all) or
+   `IMPOSSIBLE` district. That is not dread, it is a first impression that the mod is broken.
+   Fixed: `ARRIVAL_RADIUS = 48`; the origin district is never those three styles (the weighted roll is
+   still consumed, so no other district's stream shifts); `reliabilityFor` holds a floor that eases
+   from 0.96 at the origin to 0.86 at the radius edge; and inside the radius a `DARK` district's
+   fixtures stutter (`LIGHT_FLICKERING`) instead of giving up.
+2. **Players and entities spawned inside pillars.** A pillar tile is *open floor with a column
+   through the walking space*, and `BackroomsSpawn.find` only tested `isSolid`. All six call sites —
+   `HoleEntry` arrival plus four `HorrorDirector` entity spawns — could place a 2-block-tall creature
+   inside the column. Fixed with `Level0Layout.isWalkable` (not solid **and** not pillar), used by
+   `find`.
+
+The tests now state the design instead of a count: pillar districts must each carry ≥6 pillars and
+every pillar must have ≥2 walkable sides (measured: 9 districts, 157 pillars, worst case 2 sides —
+pillars against a district's own wall ring legitimately lose a side); arrival lighting is sampled over
+the whole disc and five seeds (measured: 651 fixtures, 94.2% lit, 82.9% working, asserted at 85%/75%);
+depth must measurably undo it (reliability drop > 0.30, lit-ratio gap > 0.15); and `BackroomsSpawn`
+must never return a non-walkable column for 300 fixed probes (measured: 0 failures, worst search
+radius 3 blocks).
+
+## A fidelity bug in the tooling, found by the same failure
+
+`tools/layout_preview.py` — documented as a line-for-line port and used to produce every design number
+in this file — called `mix(seed, drift, pack(x, z), 0)` where the Java calls `mix(seed, drift, x, z)`.
+Seven call sites hashed differently, so the preview tool was reviewing a *statistically similar but
+different* world from the one the mod generates. That is why the Python numbers said the lighting test
+should pass while CI said it failed.
+
+Fixed all seven, named the salts so the two files diff readably, and pinned the shared mixer with four
+golden vectors asserted on **both** sides (`Level0LayoutTest.hashFunctionMatchesThePythonPreviewPort`
+and the selftest), so this class of drift fails loudly instead of quietly. `landmarkAt` (monuments) and
+`puddleAt` were also missing from the port's renderer; both are now mirrored and reported.
+
+## Verification performed for this round
+
+- CI: `:compileJava` → `:jar` → `:remapJar` → `:assemble` clean; test failures reduced to the two
+  above, which are now rewritten and re-measured rather than relaxed.
+- `tools/layout_preview.py --selftest`: **11/11 PASS** — 0 sealed districts, 0 closed borders, 0/800
+  edge mismatches, reachability 1.0000 (4387/4387), open ratio mean 0.452 (0.199–0.844), drift
+  2634/6400, reliability origin 0.960 → deep 0.000, mixer golden vectors match, arrival district
+  `GRID` at reliability 0.960, 128/135 arrival fixtures lit, 3 monuments in 36 districts.
+- `tools/validate_assets.py`: 156 json, 21 sounds, 35 blocks, 25 items, 10 features — ALL OK.
+- Render smoke test: `--map` with the new monument/puddle layers writes a valid PNG.
+
+Still open and next: the five horror entities remain raw `Entity` billboards (invulnerable, no
+pathfinding, no spawn rules) — the agreed rework to real `MobEntity` mobs.

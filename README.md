@@ -25,7 +25,10 @@ jumpscares, with one stalker that hunts by sound.
   lights, generated from a procedural core (`Level0Layout`) that stitches handcrafted *grammars*
   (rooms, corridors, pillar halls, dark zones, the hub, a rare poolroom) into a connected whole.
 - **Reliable-near, unreliable-far lighting**: fixtures work near the arrival point and decay into
-  flicker and darkness the deeper you walk. Some lights genuinely fail behind you.
+  flicker and darkness the deeper you walk. Some lights genuinely fail behind you. The first
+  `ARRIVAL_RADIUS` = 48 blocks are a promise the level keeps: reliability is held at ~0.96, dark
+  districts stutter instead of dying, and the district you noclip into is never a dark, drowned or
+  non-euclidean one. Arriving somewhere unlit reads as a broken world, not as dread.
 - **No music.** The soundscape is fluorescent buzz, distant hum, drips and rare, deniable one-shots.
 - **The horror is quiet**: phantom footsteps behind walls, a figure at the edge of vision that is
   gone when you look, corridors that are longer than you remember. Long stretches, *nothing happens*.
@@ -155,14 +158,17 @@ python3 tools/layout_preview.py --map out.png        # render a plan
 python3 tools/validate_assets.py                     # JSON / texture / sound cross-references
 ```
 
-`--selftest` executes the real algorithm (the Python port mirrors `Level0Layout` exactly, including
-Java's `Random` LCG and 64-bit hashing) and checks, across many seeds, that: the plane is connected,
-every district opens onto all four neighbours, the shared edge hash agrees from both sides, the
-open/wall ratio stays playable, and the only unreachable pockets are the ones `IMPOSSIBLE` districts
-seal **on purpose**.
+`--selftest` executes the real algorithm (the Python port mirrors `Level0Layout`, including Java's
+`Random` LCG and 64-bit hashing) and checks, across many seeds, that: the plane is connected, every
+district opens onto all four neighbours, the shared edge hash agrees from both sides, the open/wall
+ratio stays playable, the arrival promise holds, monuments appear at roughly one district in eight,
+and the only unreachable pockets are the ones `IMPOSSIBLE` districts seal **on purpose**.
 
-> `Level0Layout.java` and `tools/layout_preview.py` must be changed together. The selftest will not
-> detect drift between them; that is a human obligation.
+> `Level0Layout.java` and `tools/layout_preview.py` must be changed together. The shared mixer is now
+> pinned by golden vectors asserted on *both* sides (`Level0LayoutTest.hashFunctionMatchesThePythonPreviewPort`
+> and the selftest), because the port once packed the two coordinates into a single hash argument and
+> silently previewed a different world from the one the mod generates. Anything beyond the mixer is
+> still a human obligation.
 
 ## Building & playing
 

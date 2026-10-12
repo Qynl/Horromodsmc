@@ -43,6 +43,16 @@ LIGHT_MASK = 3
 SURFACE_CLEAN, SURFACE_STAINED, SURFACE_DAMP, SURFACE_MOULDY = 0, 1, 2, 3
 LIGHT_NONE, LIGHT_WORKING, LIGHT_FLICKERING, LIGHT_DEAD = 0, 1, 2, 3
 
+# Level0Layout.ARRIVAL_RADIUS: inside this the arrival promise holds (lights stay lit, the arrival
+# district is never DARK / POOLROOM / IMPOSSIBLE).
+ARRIVAL_RADIUS = 48
+
+# Salts and constants shared with Level0Layout, named here so a diff between the two files is
+# readable rather than a hunt for hex literals.
+PUDDLE_SALT = 0x9D1E0000AA11
+LIGHT_SALT = 0x2545F4914F6CDD1D
+GOLDEN_RATIO = 0x9E3779B97F4A7C15
+
 PROP_NONE, PROP_CHAIR, PROP_DESK, PROP_BARREL, PROP_BOX, PROP_VENDING = 0, 1, 2, 3, 4, 5
 PROP_COUNT = 5
 PROP_SALT = 0xA5A5A5A5C0FFEE01
@@ -149,6 +159,10 @@ class Level0Layout:
     def is_pillar(self, x: int, z: int) -> bool:
         return (self.tile_bits(x, z) & BIT_PILLAR) != 0
 
+    def is_walkable(self, x: int, z: int) -> bool:
+        b = self.tile_bits(x, z)
+        return not (b & BIT_SOLID) and not (b & BIT_PILLAR)
+
     def style(self, x: int, z: int) -> int:
         return self.plan(x, z).style
 
@@ -166,7 +180,7 @@ class Level0Layout:
         u = self.is_solid(x, z - 1); d = self.is_solid(x, z + 1)
         if (l and r) or (u and d):
             return PROP_NONE
-        h = mix(self.seed, self.drift ^ PROP_SALT, pack(x, z), 0)
+        h = mix(self.seed, self.drift ^ PROP_SALT, x, z)
         roll = (h >> 17) % 1000
         base = 42 if self.level == 1 else (34 if self.level == 2 else (30 if self.level == 3 else (20 if self.level == 4 else (26 if self.level == 5 else (12 if self.level == 6 else (12 if self.level == 7 else (22 if self.level == 8 else 26)))))))
         density = base // 2 if self.style(x, z) == 3 else base
@@ -178,8 +192,22 @@ class Level0Layout:
         b = self.tile_bits(x, z)
         if b & BIT_SOLID or b & BIT_PILLAR:
             return False
-        h = mix(self.seed, self.drift ^ CAMERA_SALT, pack(x, z), 0)
+        h = mix(self.seed, self.drift ^ CAMERA_SALT, x, z)
         return ((h >> 19) % 1000) < 5
+
+    def landmark_at(self, x: int, z: int) -> int:
+        """Rare monument at a district centre: 0 for none, else a 1..3 variant.
+
+        Mirrors Level0Layout.landmarkAt. Note it hashes without drift, so monuments do not move when
+        the level re-solves - they are the fixed reference points in an otherwise shifting maze.
+        """
+        dx, dz = x // N, z // N
+        h = mix(self.seed, dx, dz, 0x51ED270B)
+        if (h >> 40) % 100 >= 12:
+            return 0
+        if x != dx * N + N // 2 or z != dz * N + N // 2:
+            return 0
+        return 1 + (h >> 20) % 3
 
     def puddle_at(self, x: int, z: int) -> bool:
         if self.level != 1 and self.level != 3 and self.level != 8:
@@ -187,7 +215,7 @@ class Level0Layout:
         b = self.tile_bits(x, z)
         if b & BIT_SOLID or b & BIT_PILLAR:
             return False
-        h = mix(self.seed, self.drift ^ 0x9D1E0000AA11, pack(x, z), 0)
+        h = mix(self.seed, self.drift ^ PUDDLE_SALT, x, z)
         return ((h >> 21) % 1000) < 40
 
     def reliability(self, x: int, z: int) -> float:
@@ -216,16 +244,19 @@ class Level0Layout:
     def _reliability_for(self, x: int, z: int, dx: int, dz: int, style: int) -> float:
         dist = math.sqrt(x * x + z * z)
         base = 1.0 - dist / 9000.0
-        h = mix(self.seed, self.drift, pack(dx, dz), 0)
+        h = mix(self.seed, self.drift, dx, dz)
         local = ((h >> 11) % 1000 / 1000.0 - 0.5) * 0.35
         if style == 3:  # DARK
             local -= 0.45
         if style == 5:  # HUB
             local += 0.2
-        return max(0.0, min(1.0, base + local))
+        rel = max(0.0, min(1.0, base + local))
+        if dist <= ARRIVAL_RADIUS:
+            rel = max(rel, 0.86 + 0.10 * (1.0 - dist / ARRIVAL_RADIUS))
+        return rel
 
     def _build_plan(self, dx: int, dz: int) -> "DistrictPlan":
-        base = mix(self.seed, self.drift, pack(dx, dz), 0)
+        base = mix(self.seed, self.drift, dx, dz)
         rng = JavaRandom(base)
         style = self._choose_style(rng, dx, dz)
 
@@ -467,11 +498,17 @@ class Level0Layout:
             ]
         total = sum(weights)
         roll = rng.next_double() * total
+        picked = 7
         for i, w in enumerate(weights):
             roll -= w
             if roll < 0:
-                return i
-        return 7
+                picked = i
+                break
+        # The arrival district is never DARK (3), IMPOSSIBLE (6) or POOLROOM (7): arriving somewhere
+        # unlit or illegible reads as a broken world. Mirrors Level0Layout.chooseStyle.
+        if dx == 0 and dz == 0 and picked in (3, 6, 7):
+            return 5  # HUB
+        return picked
 
     def _build_standard(self, bits: bytearray, room: list, rng: JavaRandom, style: int) -> None:
         trunk_row = 2 + rng.next_int(N - 4)
@@ -612,12 +649,15 @@ class Level0Layout:
                     light = LIGHT_NONE
                     if on_lattice:
                         rel = self._reliability_for(wx, wz, dx, dz, style)
-                        h = mix(self.seed, self.drift ^ 0x2545F4914F6CDD1D, pack(wx, wz), 0)
+                        h = mix(self.seed, self.drift ^ LIGHT_SALT, wx, wz)
                         roll = ((h >> 13) % 10000) / 10000.0
                         if style == 7:
                             light = LIGHT_NONE
                         elif style == 3:
-                            light = LIGHT_FLICKERING if roll < 0.12 else LIGHT_DEAD
+                            if wx * wx + wz * wz <= ARRIVAL_RADIUS * ARRIVAL_RADIUS:
+                                light = LIGHT_FLICKERING
+                            else:
+                                light = LIGHT_FLICKERING if roll < 0.12 else LIGHT_DEAD
                         elif roll < 0.55 + 0.40 * rel:
                             light = LIGHT_WORKING
                         elif roll < 0.68 + 0.25 * rel:
@@ -627,7 +667,7 @@ class Level0Layout:
                     b = (b & ~(LIGHT_MASK << LIGHT_SHIFT)) | (light << LIGHT_SHIFT)
 
                 wx, wz = dx * N + x, dz * N + z
-                sh = mix(self.seed ^ 0x9E3779B97F4A7C15, self.drift, pack(wx, wz), 0)
+                sh = mix(self.seed ^ GOLDEN_RATIO, self.drift, wx, wz)
                 s_roll = ((sh >> 21) % 10000) / 10000.0
                 surface = SURFACE_CLEAN
                 wall_neighbours = 0
@@ -1074,6 +1114,34 @@ def run_selftest(seed: int, districts: int, region: int) -> int:
     rel_near = layout.reliability(0, 0)
     rel_far = layout.reliability(6000, 6000)
 
+    # --- the mixer is shared with Java, so its output is pinned -------------
+    def signed(v: int) -> int:
+        v &= M64
+        return v - (1 << 64) if v >= 1 << 63 else v
+
+    golden = ((0, 0, 0, 0, -4673721920094353327),
+              (1234567, 0, 0, 0, -5797716211826552959),
+              (1234567, 0, 3, -7, -3269322766031515143),
+              (-1, 2, 17, 99, 4815040972024048069))
+    golden_ok = all(signed(mix(a, b, c, d)) == want for a, b, c, d, want in golden)
+
+    # --- arrival promise (mirrors Level0LayoutTest) -------------------------
+    arrival_style = STYLES[layout.style(0, 0)]
+    a_fix = a_lit = 0
+    for x in range(-ARRIVAL_RADIUS, ARRIVAL_RADIUS + 1):
+        for z in range(-ARRIVAL_RADIUS, ARRIVAL_RADIUS + 1):
+            if x * x + z * z > ARRIVAL_RADIUS * ARRIVAL_RADIUS:
+                continue
+            ls = layout.light_state(x, z)
+            if ls == LIGHT_NONE:
+                continue
+            a_fix += 1
+            a_lit += 1 if ls in (LIGHT_WORKING, LIGHT_FLICKERING) else 0
+
+    # --- monuments: the fixed reference points in a shifting maze -----------
+    monuments = sum(1 for dx in range(-3, 3) for dz in range(-3, 3)
+                    if layout.landmark_at(dx * N + N // 2, dz * N + N // 2))
+
     def check(name, cond, detail):
         status = "PASS" if cond else "FAIL"
         print(f"  [{status}] {name}: {detail}")
@@ -1102,6 +1170,13 @@ def run_selftest(seed: int, districts: int, region: int) -> int:
           f"{drift_changes} of 6400 columns changed")
     check("lighting reliability decays with depth", rel_far < rel_near,
           f"origin={rel_near:.3f} deep={rel_far:.3f}")
+    check("mixer matches the Java golden vectors", golden_ok,
+          "4 vectors shared with Level0LayoutTest.hashFunctionMatchesThePythonPreviewPort")
+    check("you never arrive somewhere unlit or illegible",
+          arrival_style not in ("DARK", "IMPOSSIBLE", "POOLROOM") and rel_near >= 0.85,
+          f"arrival district={arrival_style}, reliability={rel_near:.3f}")
+    check("arrival fixtures give light", a_fix > 20 and a_lit / max(a_fix, 1) >= 0.85,
+          f"{a_lit}/{a_fix} lit inside ARRIVAL_RADIUS={ARRIVAL_RADIUS}")
 
     print("\n  style mix      : " + ", ".join(
         f"{k}={v / districts:.0%}" for k, v in style_counts.most_common()))
@@ -1114,6 +1189,7 @@ def run_selftest(seed: int, districts: int, region: int) -> int:
         f"{['clean','stained','damp','mouldy'][k]}={v / ts:.1%}"
         for k, v in sorted(surface_counts.items())))
 
+    print(f"  monuments      : {monuments} of 36 districts carry one (design target ~1 in 8)")
     print("-" * 78)
     if failures:
         print(f"FAILED: {len(failures)} check(s): {', '.join(failures)}")
@@ -1139,6 +1215,8 @@ def render_map(layout: Level0Layout, path: str, tiles: int, scale: int, centre: 
     LIGHT_FLICKER = (226, 220, 170)
     LIGHT_DEAD = (120, 118, 104)
     POOL = (96, 140, 150)
+    PUDDLE = (120, 132, 108)
+    MONUMENT = (210, 226, 255)
 
     ox = centre - tiles // 2
     oz = centre - tiles // 2
@@ -1173,8 +1251,12 @@ def render_map(layout: Level0Layout, path: str, tiles: int, scale: int, centre: 
                     c = (170, 140, 90)     # box
                 elif prop == 5:
                     c = (180, 40, 50)      # vending
+                if layout.puddle_at(wx, wz):
+                    c = PUDDLE
                 if layout.camera_at(wx, wz):
                     c = (255, 60, 60)      # camera
+            if layout.landmark_at(wx, wz):
+                c = MONUMENT               # monument: drawn over walls too, it rises through them
             for sx in range(scale):
                 for sz in range(scale):
                     px[x * scale + sx, z * scale + sz] = c

@@ -10,12 +10,13 @@ public final class BackroomsSpawn {
             for (int dx = -r; dx <= r; dx++) {
                 for (int dz = -r; dz <= r; dz++) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
-                    if (!layout.isSolid(targetX + dx, targetZ + dz)) {
+                    if (layout.isWalkable(targetX + dx, targetZ + dz)) {
                         return new BlockPos(targetX + dx, Level0Layout.FLOOR_Y + 1, targetZ + dz);
                     }
                 }
             }
         }
+        // Nowhere walkable in 48 blocks: stand on the target column rather than return nothing.
         return new BlockPos(targetX, Level0Layout.FLOOR_Y + 1, targetZ);
     }
 

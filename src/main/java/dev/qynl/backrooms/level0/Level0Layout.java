@@ -59,6 +59,13 @@ public final class Level0Layout {
     /** First row of interior air / walls above the floor. */
     public static final int WALL_MIN_Y = 1;
 
+    /**
+     * Radius, in blocks, of the arrival promise. Inside it the level keeps the lights on and never
+     * drops the player into a dark, drowned or non-euclidean district; outside it the decay in
+     * {@link #reliability(int, int)} takes over and the fixtures stop being trustworthy.
+     */
+    public static final int ARRIVAL_RADIUS = 48;
+
     private static final int N = DISTRICT_TILES;
 
     // ---- tile bit layout -------------------------------------------------
@@ -248,6 +255,17 @@ public final class Level0Layout {
         return (tileBits(x, z) & BIT_PILLAR) != 0;
     }
 
+    /**
+     * True where a 2-block-tall creature can actually stand: open floor with no pillar through it.
+     * A pillar tile is open floor with a column in the walking space, so {@link #isSolid(int, int)}
+     * alone is not enough - using it for arrival and spawn points put players and entities inside
+     * the column.
+     */
+    public boolean isWalkable(int x, int z) {
+        int bits = tileBits(x, z);
+        return (bits & BIT_SOLID) == 0 && (bits & BIT_PILLAR) == 0;
+    }
+
     /** 0 clean, 1 stained, 2 damp, 3 mouldy. Drives blockstate variant + stain decals. */
     public int surface(int x, int z) {
         return (tileBits(x, z) >> SURFACE_SHIFT) & SURFACE_MASK;
@@ -350,7 +368,19 @@ public final class Level0Layout {
         float local = (Math.floorMod(h >>> 11, 1000) / 1000.0f - 0.5f) * 0.35f;
         if (style == Style.DARK) local -= 0.45f;
         if (style == Style.HUB) local += 0.2f;
-        return clamp01(base + local);
+        float rel = clamp01(base + local);
+        // District noise alone can roll a pitch-black spawn, which reads as a broken world rather
+        // than as dread. Near the arrival point the level holds the lights up; the floor is released
+        // smoothly so the falloff past it is not a visible seam.
+        if (dist <= ARRIVAL_RADIUS) {
+            rel = Math.max(rel, (float) (0.86 + 0.10 * (1.0 - dist / ARRIVAL_RADIUS)));
+        }
+        return rel;
+    }
+
+    /** True inside {@link #ARRIVAL_RADIUS} of the level origin, where the arrival promise holds. */
+    private static boolean nearArrival(int x, int z) {
+        return (long) x * x + (long) z * z <= (long) ARRIVAL_RADIUS * ARRIVAL_RADIUS;
     }
 
     // ---- plan construction ----------------------------------------------
@@ -623,6 +653,19 @@ public final class Level0Layout {
 
         double total = wGrid + wOrganic + wHall + wDark + wLong + wHub + wImpossible + wPoolroom;
         double roll = rng.nextDouble() * total;
+        Style picked = pickWeighted(roll, wGrid, wOrganic, wHall, wDark, wLong, wHub, wImpossible);
+        // The arrival district is the one district whose style is not left entirely to chance: a
+        // dark, drowned or non-euclidean room at the point you noclip in reads as a bug. The roll is
+        // still consumed above, so no other district's stream shifts.
+        if (dx == 0 && dz == 0
+                && (picked == Style.DARK || picked == Style.POOLROOM || picked == Style.IMPOSSIBLE)) {
+            return Style.HUB;
+        }
+        return picked;
+    }
+
+    private static Style pickWeighted(double roll, double wGrid, double wOrganic, double wHall,
+                                      double wDark, double wLong, double wHub, double wImpossible) {
         if ((roll -= wGrid) < 0) return Style.GRID;
         if ((roll -= wOrganic) < 0) return Style.ORGANIC;
         if ((roll -= wHall) < 0) return Style.HALL;
@@ -1311,7 +1354,11 @@ public final class Level0Layout {
                         if (style == Style.POOLROOM) {
                             light = LIGHT_NONE;
                         } else if (style == Style.DARK) {
-                            light = roll < 0.12 ? LIGHT_FLICKERING : LIGHT_DEAD;
+                            // Dead everywhere except at the arrival point, where the level is still
+                            // switched on: there the fixtures stutter instead of giving up.
+                            light = nearArrival(wx, wz)
+                                    ? LIGHT_FLICKERING
+                                    : (roll < 0.12 ? LIGHT_FLICKERING : LIGHT_DEAD);
                         } else if (roll < 0.55 + 0.40 * rel) {
                             light = LIGHT_WORKING;
                         } else if (roll < 0.68 + 0.25 * rel) {
