@@ -6,6 +6,7 @@ import dev.qynl.backrooms.level.BackroomsLevelBuilder;
 import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.light.LightFlickerSystem;
 import dev.qynl.backrooms.registry.ModBlockEntities;
+import dev.qynl.backrooms.registry.ModChunkGenerators;
 import dev.qynl.backrooms.registry.ModBlocks;
 import dev.qynl.backrooms.registry.ModEntityTypes;
 import dev.qynl.backrooms.registry.ModFeatures;
@@ -84,6 +85,7 @@ public class BackroomsMod implements ModInitializer {
         ignored = ModBlockEntities.REALITY_TEAR;
         ignored = ModFeatures.LEVEL0_BUILD;
         ignored = ModEntityTypes.GLIMPSE;
+        ignored = ModChunkGenerators.LEVEL_GEN;
         if (ignored == null) {
             throw new IllegalStateException("backrooms registration failed");
         }

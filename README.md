@@ -92,6 +92,8 @@ underwater cave off Level 7.
 
 ## Getting deeper (the wiki's way in)
 - **Overworld → Level 0**: the rare **tear** in normal terrain — walk in.
+  (Ops can also use `/backrooms go <level>`, and `/backrooms rebuild` re-paints the loaded chunks
+  around you in case a world still carries bedrock-only chunks from an older build.)
 - **Level 0 → Level 1**: per the wiki, *"survive long enough to find a **flickering wall** to throw
   yourself through."* Rare sections of wall stutter and are not quite solid; step into one.
 - **Level 1 → Level 2**: per the wiki, Level 2 is reached by *"traversing down any corridors that

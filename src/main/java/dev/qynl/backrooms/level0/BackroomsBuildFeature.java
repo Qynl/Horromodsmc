@@ -8,7 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.server.world.ServerWorldAccess;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
@@ -42,8 +42,8 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     }
 
     /** Paints one 16x16 chunk of this level from the layout. */
-    public void paintChunk(StructureWorldAccess world, int cx, int cz) {
-        Level0Layout layout = Level0Holder.get(world.getSeed(), levelId);
+    public void paintChunk(ServerWorldAccess world, int cx, int cz) {
+        Level0Layout layout = Level0Holder.get(world.getServer().getOverworld().getSeed(), levelId);
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         for (int lx = 0; lx < 16; lx++) {
             for (int lz = 0; lz < 16; lz++) {
@@ -57,7 +57,7 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
      * a loaded chunk does not look like the level it should be - which also repairs worlds saved by
      * older builds whose Backrooms chunks are bare bedrock.
      */
-    public static void buildChunk(StructureWorldAccess world, int levelId, int cx, int cz) {
+    public static void buildChunk(ServerWorldAccess world, int levelId, int cx, int cz) {
         new BackroomsBuildFeature(levelId).paintChunk(world, cx, cz);
     }
 

@@ -275,3 +275,25 @@ No JDK/Minecraft maven access in this sandbox, so nothing here was compiled or p
 (`.github/workflows/build.yml`) is the compile gate. Art direction is now structured but still
 procedural 16x16; a hand-authored pass would beat it. Entities are still billboards and still raw
 `Entity` (invulnerable, no pathfinding) - see P1-9 and P2-1..P2-5 above.
+
+---
+
+# Round 3 — "the dimension is just bedrock"
+
+Root cause chain, in order of importance:
+
+1. **Rounds 1 and 2 never compiled.** A scripted edit inserted a `//` comment in the middle of a
+   fluent vertex chain in `ListenerRenderer`/`SmilerRenderer`, swallowing `.normal(...)`: 8 syntax
+   errors. CI (`.github/workflows/build.yml`) failed on both commits, so any jar in circulation
+   predates every fix. Lesson recorded: CI is the only compiler available to this workflow and its
+   status must be checked after every push - it now is.
+2. **The level relied on flat-generator biome decoration**, which evidently never painted in real
+   worlds, leaving the superflat bedrock shell as the only thing generated.
+   Fix: `BackroomsChunkGenerator extends FlatChunkGenerator` (codec registered as
+   `backrooms:level_gen`, referenced by all nine `dimension/levelN.json`) paints the level in
+   `buildSurface` - the very pass that lays the bedrock, on the generation thread, before the chunk
+   is saved. Correct by construction, independent of decoration flags or ordering.
+   `paintChunk`/`buildChunk` now take `ServerWorldAccess` so worldgen regions and live server worlds
+   share one code path.
+3. **Existing broken saves** are still repaired twice over: the chunk-load verifier (round 1) and a
+   new op command `/backrooms rebuild`, which re-paints the 25x22 loaded chunks around the player.

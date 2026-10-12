@@ -1,10 +1,11 @@
 {
   "type": "backrooms:level6",
   "generator": {
-    "type": "minecraft:flat",
+    "type": "backrooms:level_gen",
+    "level": 6,
     "settings": {
       "biome": "backrooms:level6",
-      "features": true,
+      "features": false,
       "lakes": false,
       "layers": [
         {
