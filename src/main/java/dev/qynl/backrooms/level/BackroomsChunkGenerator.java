@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.qynl.backrooms.level0.BackroomsBuildFeature;
 import net.minecraft.world.gen.StructureAccessor;
-import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
@@ -21,6 +21,9 @@ import net.minecraft.world.gen.noise.NoiseConfig;
  * bedrock floor. {@link #buildSurface} is the pass that lays that bedrock, so it cannot be skipped
  * by config or ordering; painting the level right after it makes a generated chunk correct by
  * construction, on the generation thread, before the chunk is ever saved.
+ *
+ * <p>{@code ChunkRegion} implements {@code ServerWorldAccess}, so the same paint path is used
+ * during worldgen and by the live-world repair hooks.
  *
  * <p>{@code BackroomsLevelBuilder}'s chunk-load verifier stays as a second net: it repairs chunks
  * that older builds already saved as bedrock.
@@ -48,7 +51,7 @@ public class BackroomsChunkGenerator extends FlatChunkGenerator {
     }
 
     @Override
-    public void buildSurface(ServerWorldAccess world, StructureAccessor structures,
+    public void buildSurface(ChunkRegion world, StructureAccessor structures,
                              NoiseConfig noiseConfig, Chunk chunk) {
         super.buildSurface(world, structures, noiseConfig, chunk);   // the bedrock shell
         new BackroomsBuildFeature(levelId).paintChunk(world, chunk.getPos().x, chunk.getPos().z);

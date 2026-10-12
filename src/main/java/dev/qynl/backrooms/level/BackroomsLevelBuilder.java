@@ -31,7 +31,7 @@ public final class BackroomsLevelBuilder {
         ServerChunkEvents.CHUNK_LOAD.register(BackroomsLevelBuilder::onChunkLoad);
     }
 
-    private static void onChunkLoad(WorldChunk chunk, ServerWorld world) {
+    private static void onChunkLoad(ServerWorld world, WorldChunk chunk) {
         int level = levelOf(world.getRegistryKey());
         if (level < 0) {
             return;

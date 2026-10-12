@@ -53,7 +53,7 @@ public class BackroomsMod implements ModInitializer {
         BackroomsCommands.register();
         BackroomsLevelBuilder.register();
         registerItemGroup();
-        ServerChunkEvents.CHUNK_UNLOAD.register((chunk, world) ->
+        ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) ->
                 LightFlickerSystem.onChunkUnload(world.getRegistryKey(), chunk.getPos().toLong()));
 
         ServerTickEvents.END_SERVER_TICK.register(HorrorDirector::onServerTick);

@@ -145,7 +145,7 @@ public class SkinStealerEntity extends Entity {
         }
 
         double len = Math.hypot(dx, dz);
-        double vy = (onGround || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
+        double vy = (isOnGround() || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
         if (len > 0.001) {
             setVelocity((dx / len) * speed, vy, (dz / len) * speed);
         } else {

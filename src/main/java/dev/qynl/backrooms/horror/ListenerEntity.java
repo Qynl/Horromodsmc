@@ -147,8 +147,8 @@ public class ListenerEntity extends Entity {
 
         // Plain Entities get no gravity from anywhere else: without this the vertical velocity
         // never decays and a wall bump while chasing sent it into the ceiling for good.
-        double vy = (onGround || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
-        if (horizontalCollision && state == STATE_CHASE && onGround) {
+        double vy = (isOnGround() || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
+        if (horizontalCollision && state == STATE_CHASE && isOnGround()) {
             vy = 0.42;   // step up when it bumps a wall it is determined about
         }
         if (len > 0.001) {
