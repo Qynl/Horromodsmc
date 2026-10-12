@@ -3,7 +3,7 @@ package dev.qynl.backrooms.level;
 import dev.qynl.backrooms.level0.BackroomsBuildFeature;
 import dev.qynl.backrooms.level0.Level0Layout;
 import dev.qynl.backrooms.registry.ModBlocks;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
@@ -28,7 +28,7 @@ public final class BackroomsLevelBuilder {
 
     /** Registers the chunk-load hook. Called once from the mod initializer. */
     public static void register() {
-        ChunkEvents.CHUNK_LOAD.register(BackroomsLevelBuilder::onChunkLoad);
+        ServerChunkEvents.CHUNK_LOAD.register(BackroomsLevelBuilder::onChunkLoad);
     }
 
     private static void onChunkLoad(WorldChunk chunk, ServerWorld world) {

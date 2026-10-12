@@ -4,9 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.qynl.backrooms.level0.BackroomsBuildFeature;
-import net.minecraft.server.world.ServerWorldAccess;
-import net.minecraft.world.StructureAccessor;
-import net.minecraft.world.StructureWorldAccess;
+import net.minecraft.structure.StructureAccessor;
+import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.FlatChunkGenerator;
@@ -52,8 +51,6 @@ public class BackroomsChunkGenerator extends FlatChunkGenerator {
     public void buildSurface(ServerWorldAccess world, StructureAccessor structures,
                              NoiseConfig noiseConfig, Chunk chunk) {
         super.buildSurface(world, structures, noiseConfig, chunk);   // the bedrock shell
-        if (world instanceof StructureWorldAccess structureAccess) {
-            new BackroomsBuildFeature(levelId).paintChunk(structureAccess, chunk.getPos().x, chunk.getPos().z);
-        }
+        new BackroomsBuildFeature(levelId).paintChunk(world, chunk.getPos().x, chunk.getPos().z);
     }
 }

@@ -15,7 +15,7 @@ import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -53,7 +53,7 @@ public class BackroomsMod implements ModInitializer {
         BackroomsCommands.register();
         BackroomsLevelBuilder.register();
         registerItemGroup();
-        ChunkEvents.CHUNK_UNLOAD.register((chunk, world) ->
+        ServerChunkEvents.CHUNK_UNLOAD.register((chunk, world) ->
                 LightFlickerSystem.onChunkUnload(world.getRegistryKey(), chunk.getPos().toLong()));
 
         ServerTickEvents.END_SERVER_TICK.register(HorrorDirector::onServerTick);
