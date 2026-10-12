@@ -36,6 +36,7 @@ public class ListenerEntity extends Entity {
     private double wanderAngle;
     private int attackCooldown = 0;
     private int stepSound = 0;
+    private int farTimer = 0;
 
     public ListenerEntity(EntityType<? extends Entity> type, World world) {
         super(type, world);
@@ -81,13 +82,20 @@ public class ListenerEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        // The server owns this entity's simulation; the client copy only interpolates. Running the
+        // AI on both sides made it move twice as fast and rubber-band against the server position.
+        if (getWorld().isClient()) {
+            return;
+        }
         age++;
         if (attackCooldown > 0) attackCooldown--;
 
         PlayerEntity quarry = null;
         float heard = 0f;
+        double nearest = Double.MAX_VALUE;
         for (PlayerEntity player : getWorld().getPlayers()) {
             double dist = player.distanceTo(this);
+            if (dist < nearest) nearest = dist;
             float loud = loudness(player);
             if (loud <= 0f) continue;                       // sneaking: invisible to it
             float radius = 14f * (0.4f + loud);             // sprint ~19.6, walk ~13
@@ -96,6 +104,11 @@ public class ListenerEntity extends Entity {
                 quarry = player;
             }
         }
+        if (nearest > 80 || nearest == Double.MAX_VALUE) {
+            if (++farTimer > 20 * 20) discard();            // nobody left to haunt
+            return;
+        }
+        farTimer = 0;
 
         if (quarry != null) {
             state = STATE_CHASE;
@@ -131,16 +144,16 @@ public class ListenerEntity extends Entity {
             len = 1;
         }
 
+        // Plain Entities get no gravity from anywhere else: without this the vertical velocity
+        // never decays and a wall bump while chasing sent it into the ceiling for good.
+        double vy = (onGround || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
+        if (horizontalCollision && state == STATE_CHASE && onGround) {
+            vy = 0.42;   // step up when it bumps a wall it is determined about
+        }
         if (len > 0.001) {
-            double vx = (dx / len) * speed;
-            double vz = (dz / len) * speed;
-            double vy = getVelocity().y;
-            if (horizontalCollision && state == STATE_CHASE) {
-                vy = 0.42;   // clamber when it bumps a wall it is determined about
-            }
-            setVelocity(vx, vy, vz);
+            setVelocity((dx / len) * speed, vy, (dz / len) * speed);
         } else {
-            setVelocity(0, getVelocity().y, 0);
+            setVelocity(0, vy, 0);
         }
         move(MovementType.SELF, getVelocity());
 

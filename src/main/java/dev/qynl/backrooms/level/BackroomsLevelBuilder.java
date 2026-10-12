@@ -1,65 +1,79 @@
 package dev.qynl.backrooms.level;
 
-import dev.qynl.backrooms.hole.HoleEntry;
 import dev.qynl.backrooms.level0.BackroomsBuildFeature;
+import dev.qynl.backrooms.level0.Level0Layout;
+import dev.qynl.backrooms.registry.ModBlocks;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ChunkEvents;
+import net.minecraft.block.BlockState;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.world.chunk.WorldChunk;
 
 /**
  * Guarantees the Backrooms levels are actually built.
  *
- * <p>The level dimensions use a superflat generator, which does not reliably run biome worldgen
- * features - so relying on {@code BackroomsBuildFeature} alone left every level as bare bedrock.
- * This runs every server tick and paints any not-yet-built chunk around a player who is inside a
- * Backrooms level, straight from the deterministic layout. Idempotent and cheap once built.
+ * <p>Worldgen already paints every chunk through the biome's build feature, so this is only a
+ * safety net: it runs when a chunk of a Backrooms level <em>loads</em> (not every tick) and, if the
+ * chunk does not look like the level, paints it once from the deterministic layout. That also
+ * repairs worlds created by older builds of this mod, whose Backrooms chunks were saved as bare
+ * bedrock.
+ *
+ * <p>The old implementation repainted a 3x3 area around every player on every server tick on a live
+ * world and kept an unbounded static set of "already built" chunk keys forever, which cost a lot of
+ * TPS and leaked memory for the whole session.
  */
 public final class BackroomsLevelBuilder {
 
-    private static final Set<String> BUILT = ConcurrentHashMap.newKeySet();
-    private static final int RADIUS = 1;
+    /** Registers the chunk-load hook. Called once from the mod initializer. */
+    public static void register() {
+        ChunkEvents.CHUNK_LOAD.register(BackroomsLevelBuilder::onChunkLoad);
+    }
 
-    public static void onServerTick(MinecraftServer server) {
-        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            RegistryKey<World> key = player.getWorld().getRegistryKey();
-            int level = levelOf(key);
-            if (level < 0) {
-                continue;
-            }
-            ServerWorld world = server.getWorld(key);
-            if (world == null) {
-                continue;
-            }
-            ChunkPos c = player.getChunkPos();
-            for (int dx = -RADIUS; dx <= RADIUS; dx++) {
-                for (int dz = -RADIUS; dz <= RADIUS; dz++) {
-                    int cx = c.x + dx;
-                    int cz = c.z + dz;
-                    String id = world.getSeed() + ":" + level + ":" + cx + "," + cz;
-                    if (BUILT.contains(id)) {
-                        continue;
-                    }
-                    if (!world.getChunkManager().isChunkLoaded(cx, cz)) {
-                        continue;
-                    }
-                    BackroomsBuildFeature.buildChunk(world, level, cx, cz);
-                    BUILT.add(id);
-                }
+    private static void onChunkLoad(WorldChunk chunk, ServerWorld world) {
+        int level = levelOf(world.getRegistryKey());
+        if (level < 0) {
+            return;
+        }
+        int cx = chunk.getPos().x;
+        int cz = chunk.getPos().z;
+        if (looksBuilt(world, cx, cz, level)) {
+            return;
+        }
+        BackroomsBuildFeature.buildChunk(world, level, cx, cz);
+    }
+
+    /**
+     * Samples a few columns of the chunk. A built chunk has one of this level's floor blocks at
+     * {@link Level0Layout#FLOOR_Y}; an unbuilt (or pre-fix, bedrock-only) chunk does not.
+     */
+    private static boolean looksBuilt(ServerWorld world, int cx, int cz, int level) {
+        int baseX = cx << 4;
+        int baseZ = cz << 4;
+        BlockPos.Mutable mut = new BlockPos.Mutable();
+        for (int i = 0; i < 4; i++) {
+            int x = baseX + ((i * 5 + 3) & 15);
+            int z = baseZ + ((i * 7 + 11) & 15);
+            BlockState floor = world.getBlockState(mut.set(x, Level0Layout.FLOOR_Y, z));
+            if (isFloorOf(level, floor)) {
+                return true;
             }
         }
+        return false;
+    }
+
+    private static boolean isFloorOf(int level, BlockState state) {
+        if (level == 4) return state.isOf(ModBlocks.OFFICE_CARPET);
+        if (level == 5 || level == 7) return state.isOf(ModBlocks.HOTEL_CARPET);
+        if (level == 0) return state.isOf(ModBlocks.CARPET);
+        return state.isOf(ModBlocks.CONCRETE);
     }
 
     private static int levelOf(RegistryKey<World> key) {
-        for (int i = 0; i <= HoleEntry.MAX_LEVEL; i++) {
-            LevelTheme theme = BackroomsLevels.get(i);
-            if (theme != null && theme.dimensionKey().equals(key)) {
-                return i;
+        for (LevelTheme theme : BackroomsLevels.all()) {
+            if (theme.dimensionKey().equals(key)) {
+                return theme.id();
             }
         }
         return -1;

@@ -4,13 +4,18 @@
   "version": "${version}",
   "name": "The Backrooms: Level 0",
   "description": "A rare tear in the Overworld leads into an endless, buzzing, yellow Level 0. Psychological horror through isolation, unreliable light and impossible architecture.",
-  "authors": ["Qynl"],
+  "authors": [
+    "Qynl"
+  ],
   "license": "MIT",
-  "icon": "",
   "environment": "*",
   "entrypoints": {
-    "main": ["dev.qynl.backrooms.BackroomsMod"],
-    "client": ["dev.qynl.backrooms.BackroomsClient"]
+    "main": [
+      "dev.qynl.backrooms.BackroomsMod"
+    ],
+    "client": [
+      "dev.qynl.backrooms.BackroomsClient"
+    ]
   },
   "mixins": [],
   "depends": {

@@ -42,7 +42,7 @@ public class SkinStealerRenderer extends EntityRenderer<SkinStealerEntity> {
         matrices.multiply(dispatcher.getRotation());   // face the camera
 
         VertexConsumer vc = vcp.getBuffer(RenderLayer.getEntityTranslucent(tex));
-        int full = 15728640;
+        int full = 0xF000F0;   // pack(15,15): fullbright on both light axes
 
         // Body.
         Matrix4f m = matrices.peek().getPositionMatrix();

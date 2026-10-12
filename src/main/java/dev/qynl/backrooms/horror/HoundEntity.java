@@ -28,6 +28,7 @@ public class HoundEntity extends Entity {
     private int attackCooldown = 0;
     private int loseTimer = 0;
     private int stepSound = 0;
+    private int farTimer = 0;
     private double wanderAngle;
 
     public HoundEntity(EntityType<? extends Entity> type, World world) {
@@ -71,16 +72,26 @@ public class HoundEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        if (getWorld().isClient()) {
+            return;   // server-side simulation only; the client interpolates
+        }
         age++;
         if (attackCooldown > 0) attackCooldown--;
 
         PlayerEntity quarry = null;
+        double nearest = Double.MAX_VALUE;
         for (PlayerEntity player : getWorld().getPlayers()) {
-            if (player.distanceTo(this) < 22) {
+            double dist = player.distanceTo(this);
+            if (dist < nearest) nearest = dist;
+            if (dist < 22 && quarry == null) {
                 quarry = player;
-                break;
             }
         }
+        if (nearest > 80 || nearest == Double.MAX_VALUE) {
+            if (++farTimer > 20 * 20) discard();
+            return;
+        }
+        farTimer = 0;
 
         boolean intimidated = quarry != null && intimidated(quarry);
         if (quarry != null && !intimidated) {
@@ -107,10 +118,11 @@ public class HoundEntity extends Entity {
             dz = Math.sin(wanderAngle);
         }
         double len = Math.hypot(dx, dz);
+        double vy = (onGround || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
         if (len > 0.001) {
-            setVelocity((dx / len) * speed, getVelocity().y - 0.04, (dz / len) * speed);
+            setVelocity((dx / len) * speed, vy, (dz / len) * speed);
         } else {
-            setVelocity(0, getVelocity().y - 0.04, 0);
+            setVelocity(0, vy, 0);
         }
         move(MovementType.SELF, getVelocity());
 

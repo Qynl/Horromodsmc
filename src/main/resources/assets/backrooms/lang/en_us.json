@@ -61,7 +61,8 @@
   "backrooms.level6": "Level 6 - Lights Out",
   "block.backrooms.stair_down": "Staircase Down",
   "block.backrooms.cave_mouth": "Cave Mouth",
-  "backrooms.level7": "Level 7 - Lights Out",
-  "backrooms.level8": "Level 8 - Lights Out",
-  "block.backrooms.escape_hatch": "Escape Hatch"
+  "backrooms.level7": "Level 7 - Thalassophobia",
+  "backrooms.level8": "Level 8 - Cave System",
+  "block.backrooms.escape_hatch": "Escape Hatch",
+  "itemGroup.backrooms.main": "The Backrooms"
 }

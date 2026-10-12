@@ -8,6 +8,10 @@ import net.minecraft.util.math.random.Random;
 /**
  * A non-positional, infinitely looping layer used for the fluorescent buzz and the distant hum.
  * {@code relative} detaches it from any position so it follows the player like room tone.
+ *
+ * <p>The volume is readable by the sound engine every frame, so {@link #setVolume(float)} can duck
+ * the buzz live as the number of working lights around the player changes, without tearing the
+ * loop down and restarting it.
  */
 public class BuzzSoundInstance extends AbstractSoundInstance {
 
@@ -19,6 +23,10 @@ public class BuzzSoundInstance extends AbstractSoundInstance {
         this.x = 0;
         this.y = 0;
         this.z = 0;
+    }
+
+    public void setVolume(float v) {
+        this.volume = v;
     }
 
     @Override

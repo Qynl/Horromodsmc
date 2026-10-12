@@ -427,9 +427,9 @@ public final class Level0Layout {
         } else if (level == 2) {
             buildTunnels(bits, rng, 8, 1);      // Pipe Dreams: a dense warren of narrow tunnels
         } else if (level == 3) {
-            buildRoomGrid(bits, rng, 7);        // Electrical Station: large machine rooms
+            buildRoomGrid(bits, room, rng, 7);   // Electrical Station: large machine rooms
         } else if (level == 4) {
-            buildRoomGrid(bits, rng, 5);        // Abandoned Office: a grid of small rooms
+            buildRoomGrid(bits, room, rng, 5);   // Abandoned Office: a grid of small rooms
         } else if (level == 5) {
             buildHotel(bits, rng);              // Terror Hotel: long halls with sealed rooms off them
         } else if (level == 6) {
@@ -646,10 +646,10 @@ public final class Level0Layout {
         if (rng.nextInt(100) < 50) {
             if (rng.nextBoolean()) {
                 int r = 2 + rng.nextInt(N - 4);
-                if (Math.abs(r - trunkRow) >= 4) carveH(bits, r, rng.nextInt(10) < 15 ? 2 : 1);
+                if (Math.abs(r - trunkRow) >= 4) carveH(bits, r, rng.nextInt(100) < 15 ? 2 : 1);
             } else {
                 int c = 2 + rng.nextInt(N - 4);
-                if (Math.abs(c - trunkCol) >= 4) carveV(bits, c, rng.nextInt(10) < 15 ? 2 : 1);
+                if (Math.abs(c - trunkCol) >= 4) carveV(bits, c, rng.nextInt(100) < 15 ? 2 : 1);
             }
         }
 
@@ -949,11 +949,15 @@ public final class Level0Layout {
     }
 
     /** Levels 3 & 4 - a grid of rooms walled off from each other, linked by doorways. */
-    private void buildRoomGrid(byte[] bits, Random rng, int cell) {
+    private void buildRoomGrid(byte[] bits, boolean[] room, Random rng, int cell) {
         for (int x = 0; x < N; x++) {
             for (int z = 0; z < N; z++) {
-                if (x % cell == 0 || z % cell == 0) bits[x * N + z] |= (byte) BIT_SOLID;
-                else bits[x * N + z] &= (byte) ~BIT_SOLID;
+                if (x % cell == 0 || z % cell == 0) {
+                    bits[x * N + z] |= (byte) BIT_SOLID;
+                } else {
+                    bits[x * N + z] &= (byte) ~BIT_SOLID;
+                    room[x * N + z] = true;   // lets addPillars put columns inside the rooms
+                }
             }
         }
         int mid = cell / 2;
@@ -1229,10 +1233,13 @@ public final class Level0Layout {
                 int i = x * N + z;
                 if ((bits[i] & BIT_SOLID) != 0) continue;
                 if (!room[i]) continue;
-                if ((bits[(x - 1) * N + z] & BIT_SOLID) == 0) continue;
-                if ((bits[(x + 1) * N + z] & BIT_SOLID) == 0) continue;
-                if ((bits[x * N + (z - 1)] & BIT_SOLID) == 0) continue;
-                if ((bits[x * N + (z + 1)] & BIT_SOLID) == 0) continue;
+                // A free-standing column needs open floor on all four sides. (The previous
+                // condition was inverted and demanded four *solid* neighbours, i.e. a sealed
+                // pocket, so pillars never appeared outside HALL/HUB districts at all.)
+                if ((bits[(x - 1) * N + z] & BIT_SOLID) != 0) continue;
+                if ((bits[(x + 1) * N + z] & BIT_SOLID) != 0) continue;
+                if ((bits[x * N + (z - 1)] & BIT_SOLID) != 0) continue;
+                if ((bits[x * N + (z + 1)] & BIT_SOLID) != 0) continue;
                 if (rng.nextInt(100) < chance) bits[i] |= BIT_PILLAR;
             }
         }

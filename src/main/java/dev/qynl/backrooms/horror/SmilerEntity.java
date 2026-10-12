@@ -27,6 +27,7 @@ public class SmilerEntity extends Entity {
     private int state = STATE_DRIFT;
     private int attackCooldown = 0;
     private int loseTimer = 0;
+    private int farTimer = 0;
     private double driftAngle;
     private double bob;
 
@@ -66,6 +67,9 @@ public class SmilerEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        if (getWorld().isClient()) {
+            return;   // server-side simulation only; the client interpolates
+        }
         age++;
         if (attackCooldown > 0) attackCooldown--;
         bob += 0.06;
@@ -73,8 +77,10 @@ public class SmilerEntity extends Entity {
         // It is drawn to light and to noise. Find the brightest, loudest player within reach.
         PlayerEntity quarry = null;
         double bestScore = 0;
+        double nearest = Double.MAX_VALUE;
         for (PlayerEntity player : getWorld().getPlayers()) {
             double dist = player.distanceTo(this);
+            if (dist < nearest) nearest = dist;
             if (dist > 20) continue;
             int light = getWorld().getLightLevel(player.getBlockPos());
             double hSpeed = Math.hypot(player.getVelocity().x, player.getVelocity().z);
@@ -84,6 +90,11 @@ public class SmilerEntity extends Entity {
                 quarry = player;
             }
         }
+        if (nearest > 80 || nearest == Double.MAX_VALUE) {
+            if (++farTimer > 20 * 20) discard();
+            return;
+        }
+        farTimer = 0;
 
         if (quarry != null) {
             if (state != STATE_CHASE && random.nextInt(3) == 0) {

@@ -41,10 +41,10 @@ public class ListenerRenderer extends EntityRenderer<ListenerEntity> {
         float w = 0.5f + sway;
         float h = 2.6f;
         int a = 215;
-        vc.vertex(m, -w, 0, 0).color(6, 6, 8, a).texture(0, 1).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
-        vc.vertex(m, -w, h, 0).color(6, 6, 8, a).texture(0, 0).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
-        vc.vertex(m, w, h, 0).color(6, 6, 8, a).texture(1, 0).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
-        vc.vertex(m, w, 0, 0).color(6, 6, 8, a).texture(1, 1).overlay(OverlayTexture.DEFAULT_UV).light(15728640).normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -w, 0, 0).color(6, 6, 8, a).texture(0, 1).overlay(OverlayTexture.DEFAULT_UV).light(0xF000F0)  // LightmapTextureManager.pack(15, 15): fullbright on both axes.normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, -w, h, 0).color(6, 6, 8, a).texture(0, 0).overlay(OverlayTexture.DEFAULT_UV).light(0xF000F0)  // LightmapTextureManager.pack(15, 15): fullbright on both axes.normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, h, 0).color(6, 6, 8, a).texture(1, 0).overlay(OverlayTexture.DEFAULT_UV).light(0xF000F0)  // LightmapTextureManager.pack(15, 15): fullbright on both axes.normal(0.0f, 0.0f, 1.0f);
+        vc.vertex(m, w, 0, 0).color(6, 6, 8, a).texture(1, 1).overlay(OverlayTexture.DEFAULT_UV).light(0xF000F0)  // LightmapTextureManager.pack(15, 15): fullbright on both axes.normal(0.0f, 0.0f, 1.0f);
 
         matrices.pop();
         super.render(entity, yaw, tickDelta, matrices, vcp, light);

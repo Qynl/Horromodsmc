@@ -266,9 +266,9 @@ class Level0Layout:
         elif self.level == 2:
             self._build_tunnels(bits, rng, 8, 1)
         elif self.level == 3:
-            self._build_room_grid(bits, rng, 7)
+            self._build_room_grid(bits, room, rng, 7)
         elif self.level == 4:
-            self._build_room_grid(bits, rng, 5)
+            self._build_room_grid(bits, room, rng, 5)
         elif self.level == 5:
             self._build_hotel(bits, rng)
         elif self.level == 6:
@@ -362,13 +362,14 @@ class Level0Layout:
                 if width > 1 and x + 1 <= N - 2:
                     bits[(x + 1) * N + z] &= 0xFE
 
-    def _build_room_grid(self, bits, rng, cell):
+    def _build_room_grid(self, bits, room, rng, cell):
         for x in range(N):
             for z in range(N):
                 if x % cell == 0 or z % cell == 0:
                     bits[x * N + z] |= BIT_SOLID
                 else:
                     bits[x * N + z] &= 0xFE
+                    room[x * N + z] = True
         mid = cell // 2
         for x in range(0, N, cell):
             for z in range(mid, N, cell):
@@ -483,11 +484,11 @@ class Level0Layout:
             if rng.next_boolean():
                 r = 2 + rng.next_int(N - 4)
                 if abs(r - trunk_row) >= 4:
-                    _carve_h(bits, r, 2 if rng.next_int(10) < 15 else 1)
+                    _carve_h(bits, r, 2 if rng.next_int(100) < 15 else 1)
             else:
                 c = 2 + rng.next_int(N - 4)
                 if abs(c - trunk_col) >= 4:
-                    _carve_v(bits, c, 2 if rng.next_int(10) < 15 else 1)
+                    _carve_v(bits, c, 2 if rng.next_int(100) < 15 else 1)
 
         if style == 0:
             room_count = 5 + rng.next_int(4)
@@ -913,7 +914,7 @@ def _add_pillars(bits: bytearray, room: list, rng: JavaRandom, style: int) -> No
             i = x * N + z
             if bits[i] & BIT_SOLID or not room[i]:
                 continue
-            if any(not (bits[(x + dx) * N + (z + dz)] & BIT_SOLID)
+            if any(bits[(x + dx) * N + (z + dz)] & BIT_SOLID
                    for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))):
                 continue
             if rng.next_int(100) < chance:

@@ -22,6 +22,8 @@ public final class AmbientDirector {
     private static SoundInstance buzz;
     private static SoundInstance hum;
     private static long nextAmbientTick = 0;
+    private static int lightScanCooldown = 0;
+    private static int cachedNearLights = 0;
     private static final Random random = Random.create();
 
     public static void onClientTick(MinecraftClient client) {
@@ -33,10 +35,16 @@ public final class AmbientDirector {
         float master = BackroomsConfig.get().ambienceVolume;
 
         if (inLevel) {
-            int nearLights = countNearLights(client);
-            float buzzVol = (0.03f + 0.05f * Math.min(1, nearLights / 6f)) * master;
+            // Scanning ~200 block positions is not free; once a second is plenty for room tone.
+            if (lightScanCooldown-- <= 0) {
+                lightScanCooldown = 20;
+                cachedNearLights = countNearLights(client);
+            }
+            float buzzVol = (0.03f + 0.05f * Math.min(1, cachedNearLights / 6f)) * master;
             ensureLoop(client, true, buzzVol);
         } else {
+            lightScanCooldown = 0;
+            cachedNearLights = 0;
             ensureLoop(client, false, 0f);
         }
 
@@ -69,6 +77,8 @@ public final class AmbientDirector {
             if (buzz == null) {
                 buzz = new BuzzSoundInstance(ModSoundEvents.BUZZ, buzzVol, 1.0f);
                 sm.play(buzz);
+            } else if (buzz instanceof BuzzSoundInstance b) {
+                b.setVolume(buzzVol);   // duck live with the lighting instead of restarting the loop
             }
             if (hum == null) {
                 hum = new BuzzSoundInstance(ModSoundEvents.HUM, 0.02f * BackroomsConfig.get().ambienceVolume, 1.0f);

@@ -3,7 +3,6 @@ package dev.qynl.backrooms.horror;
 import dev.qynl.backrooms.config.BackroomsConfig;
 import dev.qynl.backrooms.level.BackroomsLevels;
 import dev.qynl.backrooms.level.LevelTheme;
-import dev.qynl.backrooms.hole.HoleEntry;
 import dev.qynl.backrooms.level0.BackroomsSpawn;
 import dev.qynl.backrooms.level0.Level0Holder;
 import dev.qynl.backrooms.level0.Level0Layout;
@@ -42,6 +41,12 @@ public final class HorrorDirector {
 
     private static final Map<UUID, Long> lastEvent = new HashMap<>();
     private static final Map<UUID, Long> firstSeen = new HashMap<>();
+
+    /** Drops a departing player's psychological state so paranoia does not stay pinned forever. */
+    public static void forgetPlayer(UUID id) {
+        lastEvent.remove(id);
+        firstSeen.remove(id);
+    }
     private static final List<Pending> pending = new ArrayList<>();
     private static long tick = 0;
     private static long lastDriftTick = -1;
@@ -112,11 +117,11 @@ public final class HorrorDirector {
             lightOffBehind(world, player);
         } else if (cfg.glimpses && roll(0.0007 + 0.002 * paranoia)) {
             spawnGlimpse(world, player);
-        } else if (cfg.listenerEnabled && levelId != 4 && roll(skinStealerChance(levelId, paranoia))) {
+        } else if (cfg.stalkersEnabled && levelId != 4 && roll(skinStealerChance(levelId, paranoia))) {
             spawnSkinStealer(world, player, levelId);
-        } else if (cfg.listenerEnabled && levelId >= 1 && levelId != 4 && roll(0.0006 + 0.0014 * paranoia)) {
+        } else if (cfg.stalkersEnabled && levelId >= 1 && levelId != 4 && roll(0.0006 + 0.0014 * paranoia)) {
             spawnSmiler(world, player, levelId);
-        } else if (cfg.listenerEnabled && levelId >= 1 && levelId != 4 && roll(0.0004 + 0.0010 * paranoia)) {
+        } else if (cfg.stalkersEnabled && levelId >= 1 && levelId != 4 && roll(0.0004 + 0.0010 * paranoia)) {
             spawnHound(world, player, levelId);
         } else if (cfg.listenerEnabled && levelId != 4 && roll(0.0005 + 0.0012 * paranoia)) {
             spawnListener(world, player, levelId);

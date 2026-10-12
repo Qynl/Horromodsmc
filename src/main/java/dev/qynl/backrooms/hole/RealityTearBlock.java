@@ -35,14 +35,15 @@ public class RealityTearBlock extends Block implements BlockEntityProvider {
 
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        if (!world.isClient() && entity instanceof ServerPlayerEntity player) {
+        if (!world.isClient() && entity instanceof ServerPlayerEntity player
+                && HoleEntry.canTransition(player)) {
             HoleEntry.enter(player, world);
         }
     }
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient() && player instanceof ServerPlayerEntity sp) {
+        if (!world.isClient() && player instanceof ServerPlayerEntity sp && HoleEntry.canTransition(sp)) {
             HoleEntry.enter(sp, world);
             return ActionResult.SUCCESS;
         }

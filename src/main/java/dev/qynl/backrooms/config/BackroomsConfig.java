@@ -19,9 +19,9 @@ public final class BackroomsConfig {
     private static BackroomsConfig INSTANCE;
 
     /** 1-in-N chance a surface chunk gets a hole candidate. Higher = rarer. */
-    public int holeRarity = 3000;
-    /** Underground holes are this many times more common than surface ones. */
-    public float undergroundHoleFactor = 3.0f;
+    public int holeRarity = 900;
+    /** 1-in-N chance an underground chunk gets a hole candidate. Caves are sparse, so this is denser. */
+    public int undergroundHoleRarity = 260;
     /** Whether "phantom footsteps" behind walls are enabled. */
     public boolean phantomFootsteps = true;
     /** Whether the level slowly re-solves itself while the player is elsewhere. */
@@ -36,6 +36,8 @@ public final class BackroomsConfig {
     public boolean lightsFailBehind = true;
     /** Whether the Listener (the blind, hearing-based entity) can appear. */
     public boolean listenerEnabled = true;
+    /** Whether the stalking entities (Smiler, Hound, Skin-Stealer) can appear. */
+    public boolean stalkersEnabled = true;
     /** How far the Listener can hear normal movement, in blocks. Sprinting multiplies this. */
     public float listenerHearing = 14.0f;
 

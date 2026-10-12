@@ -1,8 +1,8 @@
 # The Backrooms — Levels 0-8
 
 A Fabric mod for **Minecraft 1.21.1** that adds a rare tear in the Overworld leading into an
-effectively endless, buzzing, yellow **Level 0** — and, deeper still, the damp concrete warehouse
-of **Level 1** and the narrow brick-and-steel utility tunnels of **Level 2**. It is built around
+effectively endless, buzzing, yellow **Level 0** — and, deeper still, eight more levels down to the
+caves of Level 8. It is built around
 psychological horror — isolation, unreliable light and impossible architecture — rather than
 jumpscares, with one stalker that hunts by sound.
 
@@ -142,6 +142,7 @@ generator, entry, drift, horror and lighting are all level-agnostic. See `Backro
 | `tools/gen_textures.py` / `tools/gen_audio.py` | Deterministically regenerate every PNG / OGG. |
 | `tools/validate_assets.py` | Cross-references Java registries against the resource files. |
 | `docs/preview/*.png` | Rendered plans of Level 0 (origin, deep, and after drift). |
+| `docs/AUDIT.md` | Deep audit of what was broken and the prioritised improvement plan. |
 | `src/test/java/...` | JUnit tests for the shipped core. |
 
 ## Verifying the design (no Minecraft needed)
@@ -168,5 +169,7 @@ from spawn until you find a hole. Bring torches. They won't help, but bring them
 
 ## Tuning
 
-`config/backrooms.json` (created on first run) exposes hole rarity, drift interval, and on/off
-switches for phantom footsteps, glimpses and failing lights.
+`config/backrooms.json` (created on first run) exposes surface and underground hole rarity
+(`holeRarity`, `undergroundHoleRarity` — lower is more common; drop both to ~20 to find a tear
+quickly while testing), the drift interval, and on/off switches for phantom footsteps, glimpses,
+failing lights, the Listener (`listenerEnabled`) and the stalking entities (`stalkersEnabled`).

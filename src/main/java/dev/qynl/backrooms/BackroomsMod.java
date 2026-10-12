@@ -14,10 +14,19 @@ import dev.qynl.backrooms.registry.ModSoundEvents;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.GenerationStep;
 
@@ -41,10 +50,30 @@ public class BackroomsMod implements ModInitializer {
                 !BackroomsLevels.isBackrooms(world.getRegistryKey()));
 
         BackroomsCommands.register();
+        BackroomsLevelBuilder.register();
+        registerItemGroup();
+        ChunkEvents.CHUNK_UNLOAD.register((chunk, world) ->
+                LightFlickerSystem.onChunkUnload(world.getRegistryKey(), chunk.getPos().toLong()));
 
         ServerTickEvents.END_SERVER_TICK.register(HorrorDirector::onServerTick);
-        ServerTickEvents.END_SERVER_TICK.register(BackroomsLevelBuilder::onServerTick);
         ServerTickEvents.END_SERVER_TICK.register(LightFlickerSystem::onServerTick);
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+                HorrorDirector.forgetPlayer(handler.getPlayer().getUuid()));
+    }
+
+    /** Without a group the mod's items appear nowhere in the creative inventory, only via /give. */
+    private static void registerItemGroup() {
+        RegistryKey<ItemGroup> group =
+                RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(MOD_ID, "main"));
+        Registry.register(Registries.ITEM_GROUP, group, FabricItemGroup.builder()
+                .displayName(Text.translatable("itemGroup.backrooms.main"))
+                .icon(() -> new ItemStack(ModItems.WALLPAPER))
+                .build());
+        ItemGroupEvents.modifyEntriesEvent(group).register(entries -> {
+            for (net.minecraft.item.Item item : ModItems.ALL) {
+                entries.add(item);
+            }
+        });
     }
 
     /** Referencing each registry's statics forces its class initialiser (and thus its registrations). */

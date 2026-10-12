@@ -53,9 +53,9 @@ public class BackroomsBuildFeature extends Feature<DefaultFeatureConfig> {
     }
 
     /**
-     * Paints a chunk for a level without going through worldgen. Superflat dimensions do not
-     * reliably run biome features, so {@code BackroomsLevelBuilder} calls this directly each tick
-     * to guarantee the level is actually built around the player.
+     * Paints a chunk for a level outside of worldgen. {@code BackroomsLevelBuilder} calls this when
+     * a loaded chunk does not look like the level it should be - which also repairs worlds saved by
+     * older builds whose Backrooms chunks are bare bedrock.
      */
     public static void buildChunk(StructureWorldAccess world, int levelId, int cx, int cz) {
         new BackroomsBuildFeature(levelId).paintChunk(world, cx, cz);

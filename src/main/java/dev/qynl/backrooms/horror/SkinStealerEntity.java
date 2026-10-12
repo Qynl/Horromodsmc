@@ -10,7 +10,6 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -43,7 +42,8 @@ public class SkinStealerEntity extends Entity {
     private int stalkTimer = 0;
     private int clackTimer = 0;
     private int attackCooldown = 0;
-    private ServerPlayerEntity quarry;
+    private int farTimer = 0;
+    private PlayerEntity quarry;
 
     public SkinStealerEntity(EntityType<? extends Entity> type, World world) {
         super(type, world);
@@ -83,10 +83,10 @@ public class SkinStealerEntity extends Entity {
     }
 
     /** Picks who to wear: alone, you; in a group, whoever is furthest away (or already gone). */
-    private ServerPlayerEntity chooseQuarry() {
+    private PlayerEntity chooseQuarry() {
         List<? extends PlayerEntity> players = getWorld().getPlayers();
         if (players.isEmpty()) return null;
-        if (players.size() == 1) return (ServerPlayerEntity) players.get(0);
+        if (players.size() == 1) return players.get(0);
         PlayerEntity farthest = players.get(0);
         double best = -1;
         for (PlayerEntity p : players) {
@@ -96,18 +96,33 @@ public class SkinStealerEntity extends Entity {
                 farthest = p;
             }
         }
-        return (ServerPlayerEntity) farthest;
+        return farthest;
     }
 
     @Override
     public void tick() {
         super.tick();
+        // Server-side only. This tick used to run on the client too, where getWorld().getPlayers()
+        // holds client players and the cast to ServerPlayerEntity crashed the game outright.
+        if (getWorld().isClient()) {
+            return;
+        }
         age++;
         if (attackCooldown > 0) attackCooldown--;
 
         if (quarry == null || quarry.isRemoved() || quarry.distanceTo(this) > 64) {
             quarry = chooseQuarry();
         }
+        double nearest = Double.MAX_VALUE;
+        for (PlayerEntity p : getWorld().getPlayers()) {
+            double d = p.distanceTo(this);
+            if (d < nearest) nearest = d;
+        }
+        if (nearest > 80 || nearest == Double.MAX_VALUE) {
+            if (++farTimer > 20 * 20) discard();
+            return;
+        }
+        farTimer = 0;
         int state = getDataTracker().get(STATE);
 
         double speed;
@@ -130,10 +145,11 @@ public class SkinStealerEntity extends Entity {
         }
 
         double len = Math.hypot(dx, dz);
+        double vy = (onGround || verticalCollision) ? 0.0 : Math.max(getVelocity().y - 0.06, -0.7);
         if (len > 0.001) {
-            setVelocity((dx / len) * speed, getVelocity().y - 0.04, (dz / len) * speed);
+            setVelocity((dx / len) * speed, vy, (dz / len) * speed);
         } else {
-            setVelocity(0, getVelocity().y - 0.04, 0);
+            setVelocity(0, vy, 0);
         }
         move(MovementType.SELF, getVelocity());
 
